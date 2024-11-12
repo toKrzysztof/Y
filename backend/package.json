@@ -1,0 +1,16 @@
+{
+  "name": "y-app",
+  "version": "1.0.0",
+  "description": "MVP end user flow chart:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Krzysztof Torończak",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0"
+  }
+}

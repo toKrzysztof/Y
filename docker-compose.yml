@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  orientdb:
+    image: orientdb
+    container_name: orientdb
+    ports:
+      - '2424:2424'
+      - '2480:2480'
+
+    environment:
+      ORIENTDB_ROOT_PASSWORD: ${ORIENTDB_ROOT_PASSWORD}
+      ORIENTDB_NODE_NAME: ${ORIENTDB_NODE_NAME}
+
+    volumes:
+      # - <config_path>:/orientdb/config
+      - ./db-volume/db:/orientdb/databases
+      - ./db-volume/db-backup:/orientdb/backup
+
+    command: ['/orientdb/bin/server.sh', '-Ddistributed=true']
