@@ -33,14 +33,17 @@ const createDb = async (dbClient, dbName, username, password) => {
 };
 
 const doesUserExist = async (session, username) => {
-  const res = await session.command(`SELECT FROM OUser WHERE name = ${username}`);
+  const res = await session.command('SELECT FROM OUser WHERE name = :username', {
+    params: { username }
+  });
 
   return res;
 };
 
 const createDbUser = async (session, newUser, newPassword, role) => {
   const res = await session.command(
-    `CREATE USER ${newUser} IDENTIFIED BY '${newPassword}' ROLE ${role}`
+    'CREATE USER :newUser IDENTIFIED BY :newPassword ROLE :role',
+    { params: { newUser, newPassword, role } }
   );
 
   return res;
@@ -48,7 +51,13 @@ const createDbUser = async (session, newUser, newPassword, role) => {
 
 const changeDbUserPassword = async (session, username, newPassword) => {
   const res = await session.command(
-    `UPDATE OUser SET password = '${newPassword}' WHERE name = '${username}'`
+    'UPDATE OUser SET password = :password WHERE name = :username',
+    {
+      params: {
+        username,
+        password: newPassword
+      }
+    }
   );
 
   return res;

@@ -5,7 +5,7 @@ const { genHash, cmpHash } = require('../config/hash-config');
 
 // const User = require('../models/User');
 
-const secretKey = process.env.SECRET || 'bardzQQQ tAjn$ hasŁ0';
+const secretKey = process.env.SECRET;
 
 // Rejestracja użytkownika
 // router.get('/register', (_req, res) => {
@@ -43,22 +43,22 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
   try {
-    // const { username, password } = req.body;
-    // const user = await User.findOne({ username });
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
 
-    // if (!user) {
-    //   return res.status(401).json({
-    //     message: `The authentication was unsuccessful!`
-    //   });
-    // }
+    if (!user) {
+      return res.status(401).json({
+        message: `The authentication was unsuccessful!`
+      });
+    }
 
-    // const authenticated = cmpHash(password, user.password);
+    const authenticated = cmpHash(password, user.password);
 
-    // if (!authenticated) {
-    //   return res.status(401).json({
-    //     message: `The authentication was unsuccessful!`
-    //   });
-    // }
+    if (!authenticated) {
+      return res.status(401).json({
+        message: `The authentication was unsuccessful!`
+      });
+    }
 
     const token = jwt.sign({ userId: 'user._id' }, secretKey, {
       expiresIn: '1h'

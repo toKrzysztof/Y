@@ -10,7 +10,6 @@ const {
   createDbSessionPool
 } = require('./db-tools');
 
-// TODO - replace secrets with env variables
 const ORIENTDB_DB_NAME = process.env.ORIENTDB_DB_NAME;
 const ORIENTDB_ROOT_PASSWORD = process.env.ORIENTDB_ROOT_PASSWORD;
 const ORIENTDB_ADMIN_USERNAME = process.env.ORIENTDB_ADMIN_USERNAME;
