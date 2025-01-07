@@ -7,9 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx @dotenvx/dotenvx run --env-file=.env.dev -- node ./src/server.js",
     "prod": "npx @dotenvx/dotenvx run --env-file=.env.prod -- node ./src/server.js",
-    "compose-dev-windows": "npx @dotenvx/dotenvx run --env-file=.env.dev -- node ./run-compose-windows.js",
-    "compose-dev-linux": "npx @dotenvx/dotenvx run --env-file=.env.dev -- node ./run-compose-linux.js",
-    "compose-prod": "npx @dotenvx/dotenvx run --env-file=.env.prod -- node ./src/run-compose-linux.js"
+    "compose-dev-windows": "npx @dotenvx/dotenvx run --env-file=.env.dev -- node ./scripts/_run-compose-windows.js",
+    "compose-dev-linux": "npx @dotenvx/dotenvx run --env-file=.env.dev -- node ./scripts/_run-compose-linux.js",
+    "compose-prod": "npx @dotenvx/dotenvx run --env-file=.env.prod -- node ./scripts/_run-compose-linux.js"
   },
   "author": "Krzysztof Torończak",
   "license": "ISC",

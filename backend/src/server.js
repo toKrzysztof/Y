@@ -1,32 +1,39 @@
-const { dbSetup } = require('./db/setup-db');
-
-// require('dotenv').config({
-//   path: path.join(process.cwd(), '.app.env')
-// });
-
+const { dbSetup } = require('./db/db-setup');
 const express = require('express');
 const app = express();
-
 const passport = require('passport');
-app.use(passport.initialize());
-require('./config/passport-config')(passport);
+const { setPassportStrategy } = require('./config/passport-config');
 
+app.use(passport.initialize());
+setPassportStrategy(passport);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
-const authRoutes = require('./routes/auth-routes');
-app.use('/auth', authRoutes);
 
-app.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
-  res.send('Aqq panie Kruku!');
+app.get('/healthcheck', (_, res) => {
+  res.status(200).send('Server is healthy.');
+});
+
+const dbSessionPool = new Promise(async (resolve, reject) => {
+  try {
+    const pool = await dbSetup();
+    resolve(pool);
+  } catch (error) {
+    reject(error);
+  }
 });
 
 async function start() {
-  await dbSetup();
+  await dbSessionPool;
 
-  const port = process.env.PORT || 3000;
+  const { routes } = require('./routes/routes');
+  app.use(routes);
+
+  const port = process.env.PORT;
   app.listen(port, () => {
     console.log(`Serwer działa na porcie ${port}`);
   });
 }
 
 start().catch((err) => console.log(err));
+
+module.exports = { dbSessionPool };

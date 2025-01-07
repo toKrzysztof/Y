@@ -1,4 +1,5 @@
 const OrientDBClient = require('orientjs').OrientDBClient;
+
 // start - DB setup
 const connectToDb = async (host, port) => {
   const dbClient = await OrientDBClient.connect({ host, port });
@@ -63,6 +64,24 @@ const changeDbUserPassword = async (session, username, newPassword) => {
   return res;
 };
 
+// DON'T USE WITH ANY USER INPUTS -> SQL INJECTION PRONE
+const createDbClassVertex = async (session, className) => {
+  const res = await session.command(
+    `CREATE CLASS ${className} IF NOT EXISTS EXTENDS V`
+  );
+
+  return res;
+};
+
+// DON'T USE WITH ANY USER INPUTS -> SQL INJECTION PRONE
+const createDbClassEdge = async (session, className) => {
+  const res = await session.command(
+    `CREATE CLASS ${className} IF NOT EXISTS EXTENDS E`
+  );
+
+  return res;
+};
+
 const createDbSession = async (dbClient, dbName, username, password) => {
   const session = await dbClient.session({
     name: dbName,
@@ -91,6 +110,8 @@ const dbSetup = {
   doesUserExist,
   createDbUser,
   changeDbUserPassword,
+  createDbClassVertex,
+  createDbClassEdge,
   createDbSession,
   createDbSessionPool
 };

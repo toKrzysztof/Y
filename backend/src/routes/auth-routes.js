@@ -1,50 +1,39 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const router = express.Router();
+const authRoutes = express.Router();
 const { genHash, cmpHash } = require('../config/hash-config');
+const { createUser, findUser } = require('../db/queries/user-queries');
+const { acquireDbSession, closeDbSession } = require('../db/db-tools');
+const { dbSessionPool } = require('../server');
 
-// const User = require('../models/User');
+const jwtSecret = process.env.JWT_SECRET;
 
-const secretKey = process.env.SECRET;
-
-// Rejestracja użytkownika
-// router.get('/register', (_req, res) => {
-//   res.render('register');
-// });
-
-router.post('/register', async (req, res) => {
+authRoutes.post('/register', async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, firstName, lastName } = req.body;
 
     const hashedPassword = genHash(password);
 
-    await new User({
-      username,
-      password: hashedPassword
-    }).save();
+    const session = await acquireDbSession(await dbSessionPool);
+    createUser(session, firstName, lastName, username, hashedPassword);
+    closeDbSession(session);
 
     res.status(201).json({
       message: `User „${username}” has been registered succesfully!`
     });
   } catch (err) {
-    console.dir(err);
-    res.status(500).json({
-      message: 'The registration was unsucceful!',
-      problem: err.errorResponse
-    });
+    console.log(err);
+    res.status(500).send();
   }
 });
 
-// Logowanie do aplikacji
-// router.get('/login', (_req, res) => {
-//   console.log('test');
-//   res.render('login');
-// });
-
-router.post('/login', async (req, res) => {
+authRoutes.post('/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    const user = await User.findOne({ username });
+
+    const session = await acquireDbSession(await dbSessionPool);
+    const user = await findUser(session, username);
+    closeDbSession(session);
 
     if (!user) {
       return res.status(401).json({
@@ -60,7 +49,8 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ userId: 'user._id' }, secretKey, {
+    // TODO - implement refresh tokens
+    const token = jwt.sign({ userId: user['@rid'] }, jwtSecret, {
       expiresIn: '1h'
     });
 
@@ -69,12 +59,9 @@ router.post('/login', async (req, res) => {
       Authorization: token
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      message: 'The authentication was unsuccesful!',
-      problem: err.errorResponse
-    });
+    console.log(err);
+    res.status(500).send();
   }
 });
 
-module.exports = router;
+module.exports = authRoutes;

@@ -2,15 +2,19 @@ const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
 const opts = {
-  jwtFromRequest: ExtractJwt.fromHeader('Authorization'),
-  secretOrKey: process.env.JWT_SECRET || 'bardzQQQ tAjn$ hasŁ0'
+  // MUST BE LOWERCASE - 'Authorization' doesn't work
+  jwtFromRequest: ExtractJwt.fromHeader('authorization'),
+  // alternatively: authorization: bearer jwt_token
+  // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken,
+  secretOrKey: process.env.JWT_SECRET
 };
 
-module.exports = (passport) => {
-  passport.use(
+const setPassportStrategy = (passport) => {
+  return passport.use(
     new JwtStrategy(opts, (jwt_payload, done) => {
-      console.log('Jwt payload:', jwt_payload);
-      return done(null, jwt_payload.userId);
+      return done(null, { userId: jwt_payload.userId });
     })
   );
 };
+
+module.exports = { setPassportStrategy };
