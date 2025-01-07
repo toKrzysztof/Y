@@ -1,6 +1,6 @@
 const { genHash } = require('../config/hash-config');
 const { createDbClassVertex, createDbClassEdge } = require('./db-tools');
-const { createUser, followUser, muteUser } = require('./queries/user-queries');
+const { createUser, followUser, blockUser } = require('./queries/user-queries');
 const { createPost } = require('./queries/post-queries');
 const { createComment } = require('./queries/comment-queries');
 
@@ -43,21 +43,23 @@ const populateClasses = (session) => {
           followUser(session, charlie['@rid'], dave['@rid'])
         ]);
 
-        // Create mute network (in parallel)
-        await Promise.all([muteUser(session, charlie['@rid'], bob['@rid'])]);
+        // Create block network (in parallel)
+        await Promise.all([blockUser(session, charlie['@rid'], bob['@rid'])]);
 
         // Create posts (in parallel)
         const [alicePost, bobPost] = await Promise.all([
-          createPost(session, {
-            title: 'My First Post',
-            content: 'Hello everyone! This is my first post here.',
-            userId: alice['@rid']
-          }),
-          createPost(session, {
-            title: 'Great Weather Today',
-            content: 'Perfect day for a picnic in the park!',
-            userId: bob['@rid']
-          })
+          createPost(
+            session,
+            'My First Post',
+            'Hello everyone! This is my first post here.',
+            alice['@rid']
+          ),
+          createPost(
+            session,
+            'Great Weather Today',
+            'Perfect day for a picnic in the park!',
+            bob['@rid']
+          )
         ]);
 
         // Create initial comments (in parallel)

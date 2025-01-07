@@ -25,6 +25,15 @@ const updateComment = async (session, commentId, { content }) => {
     .one();
 };
 
+// Delete comment with subcomments
+const deleteComment = async (session, commentId) => {
+  await session.command(
+    'DELETE VERTEX FROM (SELECT expand(tree(0)) FROM (SELECT FROM Comment WHERE @rid = :commentId))',
+    { params: { commentId } }
+  );
+};
+
+// TODO - exclude comments from blocked users (maybe)
 const getCommentTree = async (session, commentId) => {
   return await session
     .query(
@@ -38,14 +47,6 @@ const getCommentTree = async (session, commentId) => {
       { params: { commentId } }
     )
     .all();
-};
-
-// Delete comment with subcomments
-const deleteComment = async (session, commentId) => {
-  await session.command(
-    'DELETE VERTEX FROM (SELECT expand(tree(0)) FROM (SELECT FROM Comment WHERE @rid = :commentId))',
-    { params: { commentId } }
-  );
 };
 
 module.exports = {

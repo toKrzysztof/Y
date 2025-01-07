@@ -1,12 +1,11 @@
-const commentRoutes = require('express').Router();
+const userCommentRoutes = require('express').Router();
 const {
   updateComment,
   deleteComment,
   getCommentTree
-} = require('../db/queries/comment-queries');
-const { jwtTokenValid } = require('../middleware/auth-middleware');
+} = require('../../../db/queries/comment-queries');
 
-commentRoutes.get('/comment/:commentId/comment', jwtTokenValid, async (req, res) => {
+userCommentRoutes.get('/comment/:commentId/comment', async (req, res) => {
   const { commentId } = req.params;
 
   try {
@@ -21,7 +20,7 @@ commentRoutes.get('/comment/:commentId/comment', jwtTokenValid, async (req, res)
   }
 });
 
-commentRoutes.put('/comment/:commentId', jwtTokenValid, async (req, res) => {
+userCommentRoutes.put('/comment/:commentId', async (req, res) => {
   const { commentId } = req.params;
 
   try {
@@ -36,7 +35,7 @@ commentRoutes.put('/comment/:commentId', jwtTokenValid, async (req, res) => {
   }
 });
 
-commentRoutes.delete('/comment/:commentId', jwtTokenValid, async (req, res) => {
+userCommentRoutes.delete('/comment/:commentId', async (req, res) => {
   const { commentId } = req.params;
 
   try {
@@ -51,4 +50,4 @@ commentRoutes.delete('/comment/:commentId', jwtTokenValid, async (req, res) => {
   }
 });
 
-module.exports = commentRoutes;
+module.exports = userCommentRoutes;

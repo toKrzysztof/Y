@@ -1,8 +1,6 @@
-const authRoutes = require('./auth-routes');
-const postRoutes = require('./post-routes');
-const commentRoutes = require('./comment-routes');
-const userRoutes = require('./user-routes');
+const authRoutes = require('./auth/auth-routes');
+const userRoutes = require('./user/user-routes');
 
-const routes = [authRoutes, postRoutes, commentRoutes, userRoutes];
+const routes = [authRoutes, userRoutes];
 
 module.exports = { routes };
