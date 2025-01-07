@@ -4,6 +4,8 @@ const {
   deleteComment,
   getCommentTree
 } = require('../../../db/queries/comment-queries');
+const { acquireDbSession, closeDbSession } = require('../../../db/db-tools');
+const { dbSessionPool } = require('../../../server');
 
 userCommentRoutes.get('/comment/:commentId/comment', async (req, res) => {
   const { commentId } = req.params;

@@ -1,5 +1,7 @@
 const userBlockRoutes = require('express').Router();
 const { blockUser, unblockUser } = require('../../../db/queries/user-queries');
+const { acquireDbSession, closeDbSession } = require('../../../db/db-tools');
+const { dbSessionPool } = require('../../../server');
 
 userBlockRoutes.post('/block/:blockUserId', async (req, res) => {
   try {

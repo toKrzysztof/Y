@@ -1,5 +1,7 @@
 const userMuteRoutes = require('express').Router();
 const { muteUser, unmuteUser } = require('../../../db/queries/user-queries');
+const { acquireDbSession, closeDbSession } = require('../../../db/db-tools');
+const { dbSessionPool } = require('../../../server');
 
 userMuteRoutes.post('/mute/:muteUserId', async (req, res) => {
   try {

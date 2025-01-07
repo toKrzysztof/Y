@@ -1,5 +1,7 @@
 const userFollowRoutes = require('express').Router();
 const { followUser, unfollowUser } = require('../../../db/queries/user-queries');
+const { acquireDbSession, closeDbSession } = require('../../../db/db-tools');
+const { dbSessionPool } = require('../../../server');
 
 userFollowRoutes.post('/follow/:followUserId', async (req, res) => {
   try {

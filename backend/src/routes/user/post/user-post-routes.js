@@ -1,12 +1,14 @@
 const userPostRoutes = require('express').Router();
+const { acquireDbSession, closeDbSession } = require('../../../db/db-tools');
 const {
   getPostsMadeByUser,
   getPostsOfFollowees,
   getPostsWithFirstLevelComments
 } = require('../../../db/queries/post-queries');
+const { dbSessionPool } = require('../../../server');
 
 // posts of a user
-userPostRoutes.get('/user/post/my-post', async (req, res) => {
+userPostRoutes.get('/post/my-post', async (req, res) => {
   try {
     const { userId } = req.user;
     const session = await acquireDbSession(await dbSessionPool);
@@ -21,7 +23,7 @@ userPostRoutes.get('/user/post/my-post', async (req, res) => {
 });
 
 // posts from all non-blocked users
-userPostRoutes.get('/user/post', async (req, res) => {
+userPostRoutes.get('/post', async (req, res) => {
   try {
     const { userId } = req.user;
     const session = await acquireDbSession(await dbSessionPool);
@@ -36,7 +38,7 @@ userPostRoutes.get('/user/post', async (req, res) => {
 });
 
 // posts of followed users
-userPostRoutes.get('/user/post/folowee', async (req, res) => {
+userPostRoutes.get('/post/folowee', async (req, res) => {
   try {
     const { userId } = req.user;
     const session = await acquireDbSession(await dbSessionPool);
@@ -50,7 +52,7 @@ userPostRoutes.get('/user/post/folowee', async (req, res) => {
   }
 });
 
-userPostRoutes.post('/user/post', async (req, res) => {
+userPostRoutes.post('/post', async (req, res) => {
   try {
     const { title, content } = req.body;
     const { userId } = req.user;
