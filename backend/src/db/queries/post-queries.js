@@ -1,15 +1,16 @@
-const createPost = async (session, title, content, userId) => {
+const createPost = async (session, title, content, links, userId) => {
   const post = await session
     .command(
-      'INSERT INTO Post SET title = :title, content = :content, createdAt = :now, updatedAt = :now',
-      { params: { title, content, now: new Date() } }
+      'INSERT INTO Post SET title = :title, content = :content, createdAt = :now, updatedAt = :now, links = :links',
+      { params: { title, content, now: new Date(), links } }
     )
     .one();
 
   await session
-    .command('CREATE EDGE HasPost FROM :userId TO :postId', {
-      params: { userId, postId: post['@rid'] }
-    })
+    .command(
+      'CREATE EDGE HasPost FROM (SELECT FROM User WHERE @rid = :userId) TO :postId',
+      { params: { userId, postId: post['@rid'] } }
+    )
     .one();
 
   return post;
@@ -44,19 +45,16 @@ const getPostsMadeByUser = async (session, userId) => {
 const getPostsOfFollowees = async (session, userId) => {
   return await session
     .query(
-      `MATCH {Class: User, as: user, where: (@rid = :userId)}-Follows->{Class: User, as: friend}-HasPost->{Class: Post, as: post}
+      `MATCH {Class: User, as: user, where: (@rid = :userId)}-Follows->{Class: User, as: folowee}-HasPost->{Class: Post, as: post}
       RETURN
-      friend.@rid as authorId,
-      friend.firstName as authorFirstName,
-      friend.lastName as authorLastName,
-      set({
-        "id": post.@rid,
-        "title": post.title,
-        "content": post.content,
-        "createdAt": post.createdAt,
-        "updatedAt": post.updatedAt
-      }) as posts
-      GROUP BY authorId`,
+      folowee.@rid as authorId,
+      folowee.firstName as authorFirstName,
+      folowee.lastName as authorLastName,
+      post.@rid as postId,
+      post.title as title,
+      post.content as content,
+      post.createdAt as createdAt,
+      post.updatedAt as updatedAt`,
       { params: { userId } }
     )
     .all();

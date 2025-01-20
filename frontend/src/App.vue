@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router';
-import { API_URL } from './config/env';
-console.log('TEST', API_URL);
+import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <header>
-    <div class="wrapper">
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/login">Login</RouterLink>
-      </nav>
-    </div>
-  </header>
-
-  <RouterView />
+  <div class="wrapper">
+    <RouterView />
+  </div>
 </template>
 
-<style scoped></style>
+<style lang="scss" scoped>
+// @import '@/assets/scss/global.scss';
+
+.wrapper {
+  height: 100vh;
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+}
+</style>

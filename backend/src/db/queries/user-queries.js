@@ -2,7 +2,7 @@ const findUser = async (session, username) => {
   return await session
     .query(
       `
-    SELECT FROM User 
+    SELECT @rid as id, userName FROM User 
     WHERE username = :username
   `,
       { params: { username } }
@@ -10,6 +10,38 @@ const findUser = async (session, username) => {
     .one();
 };
 
+const findFollowedUsers = async (session, userId) => {
+  return await session
+    .query(
+      `
+SELECT @rid as id, username, firstName, lastName FROM (SELECT expand(out('Follows')) FROM User WHERE @rid = :userId)
+  `,
+      { params: { userId } }
+    )
+    .all();
+};
+
+const findBlockedUsers = async (session, userId) => {
+  return await session
+    .query(
+      `
+SELECT @rid as id, username, firstName, lastName FROM (SELECT expand(out('Blocks')) FROM User WHERE @rid = :userId)
+  `,
+      { params: { userId } }
+    )
+    .all();
+};
+
+const findMutedUsers = async (session, userId) => {
+  return await session
+    .query(
+      `
+SELECT @rid as id, username, firstName, lastName FROM (SELECT expand(out('Mutes')) FROM User WHERE @rid = :userId)
+  `,
+      { params: { userId } }
+    )
+    .all();
+};
 const createUser = async (session, firstName, lastName, username, password) => {
   const existingUser = await session
     .query(`SELECT FROM User WHERE username = :username`, { params: { username } })
@@ -42,19 +74,19 @@ const createUser = async (session, firstName, lastName, username, password) => {
   return null;
 };
 
-const followUser = async (session, user1Id, user2Id) => {
+const followUser = async (session, userId, followedUsername) => {
   const existingEdge = await session
-    .query(`SELECT FROM Follows WHERE out = :user1Id AND in = :user2Id`, {
-      params: { user1Id, user2Id }
+    .query(`SELECT FROM Follows WHERE out = :userId AND in = :followedUsername`, {
+      params: { userId, followedUsername }
     })
     .one();
 
   if (!existingEdge) {
     return await session
       .command(
-        `CREATE EDGE Follows FROM (SELECT FROM V WHERE @rid = :user1Id) TO (SELECT FROM V WHERE @rid = :user2Id)`,
+        `CREATE EDGE Follows FROM (SELECT FROM V WHERE @rid = :userId) TO (SELECT FROM V WHERE username = :followedUsername)`,
         {
-          params: { user1Id, user2Id }
+          params: { userId, followedUsername }
         }
       )
       .one();
@@ -63,32 +95,32 @@ const followUser = async (session, user1Id, user2Id) => {
   return null; // Edge already exists
 };
 
-const unfollowUser = async (session, userId1, userId2) => {
+const unfollowUser = async (session, userId, unfollowedUsername) => {
   return await session
     .command(
       `
     DELETE EDGE Follows 
-    WHERE out.userId = :userId1 
-    AND in.userId = :userId2
+    WHERE out.@rid = :userId 
+    AND in.username = :unfollowedUsername
   `,
-      { params: { userId1, userId2 } }
+      { params: { userId, unfollowedUsername } }
     )
     .all();
 };
 
-const muteUser = async (session, user1Id, user2Id) => {
+const muteUser = async (session, userId, mutedUsername) => {
   const existingEdge = await session
-    .query(`SELECT FROM Mutes WHERE out = :user1Id AND in = :user2Id`, {
-      params: { user1Id, user2Id }
+    .query(`SELECT FROM Mutes WHERE out = :userId AND in = :mutedUsername`, {
+      params: { userId, mutedUsername }
     })
     .one();
 
   if (!existingEdge) {
     return await session
       .command(
-        `CREATE EDGE Mutes FROM (SELECT FROM V WHERE @rid = :user1Id) TO (SELECT FROM V WHERE @rid = :user2Id)`,
+        `CREATE EDGE Mutes FROM (SELECT FROM V WHERE @rid = :userId) TO (SELECT FROM V WHERE username = :mutedUsername)`,
         {
-          params: { user1Id, user2Id }
+          params: { userId, mutedUsername }
         }
       )
       .one();
@@ -97,32 +129,32 @@ const muteUser = async (session, user1Id, user2Id) => {
   return null; // Edge already exists
 };
 
-const unmuteUser = async (session, userId1, userId2) => {
+const unmuteUser = async (session, userId, unmutedUsername) => {
   return await session
     .command(
       `
     DELETE EDGE Mutes 
-    WHERE out.userId = :userId1 
-    AND in.userId = :userId2
+    WHERE out.@rid = :userId 
+    AND in.username = :unmutedUsername
   `,
-      { params: { userId1, userId2 } }
+      { params: { userId, unmutedUsername } }
     )
     .all();
 };
 
-const blockUser = async (session, user1Id, user2Id) => {
+const blockUser = async (session, userId, blockedUsername) => {
   const existingEdge = await session
-    .query(`SELECT FROM Blocks WHERE out = :user1Id AND in = :user2Id`, {
-      params: { user1Id, user2Id }
+    .query(`SELECT FROM Blocks WHERE out = :userId AND in = :blockedUsername`, {
+      params: { userId, blockedUsername }
     })
     .one();
 
   if (!existingEdge) {
     return await session
       .command(
-        `CREATE EDGE Blocks FROM (SELECT FROM V WHERE @rid = :user1Id) TO (SELECT FROM V WHERE @rid = :user2Id)`,
+        `CREATE EDGE Blocks FROM (SELECT FROM V WHERE @rid = :userId) TO (SELECT FROM V WHERE username = :blockedUsername)`,
         {
-          params: { user1Id, user2Id }
+          params: { userId, blockedUsername }
         }
       )
       .one();
@@ -131,15 +163,15 @@ const blockUser = async (session, user1Id, user2Id) => {
   return null; // Edge already exists
 };
 
-const unblockUser = async (session, userId1, userId2) => {
+const unblockUser = async (session, userId, unblockedUsername) => {
   return await session
     .command(
       `
     DELETE EDGE Blocks 
-    WHERE out.userId = :userId1 
-    AND in.userId = :userId2
+    WHERE out.@rid = :userId 
+    AND in.username = :unblockedUsername
   `,
-      { params: { userId1, userId2 } }
+      { params: { userId, unblockedUsername } }
     )
     .all();
 };
@@ -147,6 +179,9 @@ const unblockUser = async (session, userId1, userId2) => {
 module.exports = {
   createUser,
   findUser,
+  findFollowedUsers,
+  findMutedUsers,
+  findBlockedUsers,
   followUser,
   unfollowUser,
   muteUser,

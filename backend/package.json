@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "npx @dotenvx/dotenvx run --env-file=.env.dev -- node ./src/server.js",
+    "local": "npx @dotenvx/dotenvx run --env-file=.env.local -- node ./src/server.js",
     "prod": "npx @dotenvx/dotenvx run --env-file=.env.prod -- node ./src/server.js",
-    "compose-dev-windows": "npx @dotenvx/dotenvx run --env-file=.env.dev -- node ./scripts/_run-compose-windows.js",
-    "compose-dev-linux": "npx @dotenvx/dotenvx run --env-file=.env.dev -- node ./scripts/_run-compose-linux.js",
+    "compose-local-windows": "npx @dotenvx/dotenvx run --env-file=.env.local -- node ./scripts/_run-compose-windows.js",
+    "compose-local-linux": "npx @dotenvx/dotenvx run --env-file=.env.local -- node ./scripts/_run-compose-linux.js",
     "compose-prod": "npx @dotenvx/dotenvx run --env-file=.env.prod -- node ./scripts/_run-compose-linux.js"
   },
   "author": "Krzysztof Torończak",
@@ -16,6 +16,7 @@
   "dependencies": {
     "@dotenvx/dotenvx": "^1.32.0",
     "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",

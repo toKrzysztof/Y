@@ -3,12 +3,13 @@ const { acquireDbSession, closeDbSession } = require('../../../db/db-tools');
 const {
   getPostsMadeByUser,
   getPostsOfFollowees,
-  getPostsWithFirstLevelComments
+  getPostsWithFirstLevelComments,
+  createPost
 } = require('../../../db/queries/post-queries');
 const { dbSessionPool } = require('../../../server');
 
 // posts of a user
-userPostRoutes.get('/post/my-post', async (req, res) => {
+userPostRoutes.get('/post/own-post', async (req, res) => {
   try {
     const { userId } = req.user;
     const session = await acquireDbSession(await dbSessionPool);
@@ -54,10 +55,17 @@ userPostRoutes.get('/post/folowee', async (req, res) => {
 
 userPostRoutes.post('/post', async (req, res) => {
   try {
-    const { title, content } = req.body;
+    const { title, content, links } = req.body;
+
+    if (links.length > 3) {
+      return res
+        .status(400)
+        .send({ message: 'A maximum number of 3 links is allowed!' });
+    }
+
     const { userId } = req.user;
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await createPost(session, title, content, userId);
+    const data = await createPost(session, title, content, links, userId);
     closeDbSession(session);
 
     res.status(200).send(data);

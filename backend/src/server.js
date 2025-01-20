@@ -3,7 +3,9 @@ const express = require('express');
 const app = express();
 const passport = require('passport');
 const { setPassportStrategy } = require('./config/passport-config');
+const cookieParser = require('cookie-parser');
 
+app.use(cookieParser());
 app.use(passport.initialize());
 setPassportStrategy(passport);
 app.use(express.urlencoded({ extended: false }));
@@ -30,7 +32,7 @@ async function start() {
 
   const port = process.env.PORT;
   app.listen(port, () => {
-    console.log(`Serwer działa na porcie ${port}`);
+    console.log(`Server running on port ${port}`);
   });
 }
 

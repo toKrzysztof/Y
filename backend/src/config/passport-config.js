@@ -1,9 +1,18 @@
 const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
+
+const jwtHttpCookieExtractor = (req) => {
+  let jwt = null;
+
+  if (req?.cookies) {
+    jwt = req.cookies['auth-token'];
+  }
+
+  return jwt;
+};
 
 const opts = {
   // MUST BE LOWERCASE - 'Authorization' doesn't work
-  jwtFromRequest: ExtractJwt.fromHeader('authorization'),
+  jwtFromRequest: jwtHttpCookieExtractor,
   // alternatively: authorization: bearer jwt_token
   // jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken,
   secretOrKey: process.env.JWT_SECRET

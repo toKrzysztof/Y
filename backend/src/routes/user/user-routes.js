@@ -18,6 +18,4 @@ userRoutes.use('/user', [
   userCommentRoutes
 ]);
 
-console.log(userRoutes);
-
 module.exports = userRoutes;

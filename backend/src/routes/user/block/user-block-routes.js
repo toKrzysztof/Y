@@ -1,14 +1,17 @@
 const userBlockRoutes = require('express').Router();
-const { blockUser, unblockUser } = require('../../../db/queries/user-queries');
+const {
+  blockUser,
+  unblockUser,
+  findBlockedUsers
+} = require('../../../db/queries/user-queries');
 const { acquireDbSession, closeDbSession } = require('../../../db/db-tools');
 const { dbSessionPool } = require('../../../server');
 
-userBlockRoutes.post('/block/:blockUserId', async (req, res) => {
+userBlockRoutes.get('/block', async (req, res) => {
   try {
     const { userId } = req.user;
-    const { blockUserId } = req.user;
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await blockUser(session, userId, blockUserId);
+    const data = await findBlockedUsers(session, userId);
     closeDbSession(session);
 
     res.status(200).send(data);
@@ -18,12 +21,27 @@ userBlockRoutes.post('/block/:blockUserId', async (req, res) => {
   }
 });
 
-userBlockRoutes.delete('/block/:blockUserId', async (req, res) => {
+userBlockRoutes.post('/block/:blockUsername', async (req, res) => {
   try {
     const { userId } = req.user;
-    const { blockUserId } = req.user;
+    const { blockUsername } = req.params;
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await unblockUser(session, userId, blockUserId);
+    const data = await blockUser(session, userId, blockUsername);
+    closeDbSession(session);
+
+    res.status(200).send(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
+});
+
+userBlockRoutes.delete('/block/:blockUsername', async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { blockUsername } = req.params;
+    const session = await acquireDbSession(await dbSessionPool);
+    const data = await unblockUser(session, userId, blockUsername);
     closeDbSession(session);
 
     res.status(200).send(data);
