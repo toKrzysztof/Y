@@ -5,7 +5,8 @@ const {
   getCommentReplies,
   updateComment,
   deleteComment,
-  findComment
+  findComment,
+  createComment
 } = require('../../../db/queries/comment-queries');
 const { dbSessionPool } = require('../../../server');
 
@@ -31,6 +32,21 @@ userCommentRoutes.get('/comment/:commentId/comment', async (req, res) => {
     const decodedCommentId = atob(base64EncodedCommentId);
     const session = await acquireDbSession(await dbSessionPool);
     const data = await getCommentReplies(session, decodedCommentId, limit, skip);
+    closeDbSession(session);
+
+    res.status(200).send(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
+});
+
+userCommentRoutes.post('/comment', async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { parentId, content, username } = req.body;
+    const session = await acquireDbSession(await dbSessionPool);
+    const data = await createComment(session, content, userId, parentId, username);
     closeDbSession(session);
 
     res.status(200).send(data);

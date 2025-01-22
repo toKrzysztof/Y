@@ -58,7 +58,7 @@ useInfiniteScroll(
     await getItemsOnScroll();
   },
   {
-    distance: 50,
+    distance: 200,
     canLoadMore: () => {
       if (fetchingData.value === true) return false;
       if (

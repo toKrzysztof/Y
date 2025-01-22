@@ -22,7 +22,5 @@ autoryzacja modyfikowania, usuwania postów, komentarzy
 
 ! walidacja mute, block, follow -> nie można siebie samego
 ! websockety
-! obsluga emotikonow
-! obsluga like-ów - jeżeli user nie zablokowany
 ! naprawić .env.local i .env.prod na backendzie
 ! docker frontendu i backendu + produkcyjny nginx

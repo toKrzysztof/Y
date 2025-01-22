@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import UserCommentComponent from './UserCommentComponent.vue';
 import type { Comment } from '../models/comment-model';
+import UserCommentFormComponent from './UserCommentFormComponent.vue';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<{ commentList: Comment[] }>();
 </script>
@@ -11,6 +12,7 @@ const props = defineProps<{ commentList: Comment[] }>();
       <UserCommentComponent :comment="comment"></UserCommentComponent>
     </li>
     <p v-show="commentList.length === 0">No comments yet...</p>
+    <!-- <UserCommentFormComponent :comment-props="{parentId}"></UserCommentFormComponent> -->
   </ol>
 </template>
 <style lang="scss" scoped>

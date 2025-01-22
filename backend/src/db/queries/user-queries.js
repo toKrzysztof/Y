@@ -1,3 +1,5 @@
+const { injectRid } = require('../orientjs/db-query-param-injectors');
+
 const findUser = async (session, username) => {
   return await session
     .query(
@@ -82,14 +84,13 @@ const followUser = async (session, userId, followedUsername) => {
     .one();
 
   if (!existingEdge) {
-    return await session
-      .command(
-        `CREATE EDGE Follows FROM (SELECT FROM V WHERE @rid = :userId) TO (SELECT FROM V WHERE username = :followedUsername)`,
-        {
-          params: { userId, followedUsername }
-        }
-      )
-      .one();
+    const query = injectRid(
+      `CREATE EDGE Follows FROM :userId TO (SELECT FROM User WHERE username = :followedUsername)`,
+      'userId',
+      userId
+    );
+
+    return await session.command(query, { params: { followedUsername } }).one();
   }
 
   return null; // Edge already exists
@@ -116,14 +117,7 @@ const muteUser = async (session, userId, mutedUsername) => {
     .one();
 
   if (!existingEdge) {
-    return await session
-      .command(
-        `CREATE EDGE Mutes FROM (SELECT FROM V WHERE @rid = :userId) TO (SELECT FROM V WHERE username = :mutedUsername)`,
-        {
-          params: { userId, mutedUsername }
-        }
-      )
-      .one();
+    return await session.create().one();
   }
 
   return null; // Edge already exists

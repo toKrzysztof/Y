@@ -10,14 +10,7 @@ const findComment = async (session, commentId) => {
   return await session.query(query).one();
 };
 
-const createComment = async (
-  session,
-  content,
-  userId,
-  parentId,
-  parentType,
-  username
-) => {
+const createComment = async (session, content, userId, parentId, username) => {
   const comment = await session
     .command(
       'INSERT INTO Comment SET username = :username, content = :content, createdAt = :now, updatedAt = :now',
@@ -26,15 +19,22 @@ const createComment = async (
     .one();
 
   await session
-    .command('CREATE EDGE MadeComment FROM :userId TO :commentId', {
-      params: { userId, commentId: comment['@rid'] }
-    })
+    .command(
+      injectRid('CREATE EDGE MadeComment FROM :userId TO :commentId', 'userId', userId),
+      {
+        params: { commentId: comment['@rid'] }
+      }
+    )
     .one();
 
   await session
     .command(
-      'CREATE EDGE HasComment FROM (SELECT FROM :parentType WHERE @rid = :parentId) TO (SELECT FROM Comment WHERE @rid = :commentId)',
-      { params: { parentType, parentId, commentId: comment['@rid'] } }
+      injectRid(
+        'CREATE EDGE HasComment FROM :parentId TO (SELECT FROM Comment WHERE @rid = :commentId)',
+        'parentId'
+      ),
+      parentId,
+      { params: { commentId: comment['@rid'] } }
     )
     .one();
 
