@@ -5,6 +5,8 @@ import UserChatView from './views/UserChatView.vue';
 import UserFeedView from './views/UserFeedView.vue';
 import UserProfileView from './views/UserProfileView.vue';
 import UserMetadataFormView from './views/UserMetadataFormView.vue';
+import TestView from './views/TestView.vue';
+import UserCommentThreadView from './views/UserCommentThreadView.vue';
 
 export const USER_ROUTES: RouteRecordRaw[] = [
   {
@@ -38,5 +40,16 @@ export const USER_ROUTES: RouteRecordRaw[] = [
         component: UserMetadataFormView
       }
     ]
+  },
+  {
+    path: 'test',
+    name: 'Test',
+    component: TestView
+  },
+  {
+    path: 'comment/:commentId',
+    name: 'Comment-thread',
+    component: UserCommentThreadView,
+    props: true
   }
 ];

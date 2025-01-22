@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { User } from '@/models/user-model';
+import type { User } from '@/modules/user/models/user-model';
 
 const props = defineProps<{ user: User }>();
 </script>

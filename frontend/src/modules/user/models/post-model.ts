@@ -1,4 +1,8 @@
+import type { Comment } from './comment-model';
+
 export interface Post {
+  readonly comments: Comment[];
+  readonly username: string;
   readonly authorFirstName: string;
   readonly authorId: string;
   readonly authorLastName: string;

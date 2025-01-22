@@ -21,7 +21,7 @@ const opts = {
 const setPassportStrategy = (passport) => {
   return passport.use(
     new JwtStrategy(opts, (jwt_payload, done) => {
-      return done(null, { userId: jwt_payload.userId });
+      return done(null, { userId: jwt_payload.userId, username: jwt_payload.username });
     })
   );
 };

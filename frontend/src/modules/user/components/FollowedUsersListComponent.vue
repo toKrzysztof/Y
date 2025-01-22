@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { User } from '@/models/user-model';
+import type { User } from '@/modules/user/models/user-model';
 import { API_URL } from '@/config/env';
 import axios from 'axios';
 import UserCardComponent from './UserCardComponent.vue';
@@ -8,8 +8,6 @@ import UserCardComponent from './UserCardComponent.vue';
 const followedUsersList = ref<User[]>((await axios.get(`${API_URL}/user/follow`)).data);
 
 const unfollowUser = (username: string) => {
-  console.log(username);
-  console.log(followedUsersList.value);
   const filteredUsers = followedUsersList.value.filter(
     (user) => user.username !== username
   );

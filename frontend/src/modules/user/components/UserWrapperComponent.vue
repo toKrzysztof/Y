@@ -5,7 +5,7 @@ import UserSidebarComponent from './UserSidebarComponent.vue';
   <div class="user-page">
     <UserSidebarComponent></UserSidebarComponent>
     <main class="user-page-content">
-      <RouterView></RouterView>
+      <RouterView :key="$route.fullPath"></RouterView>
     </main>
   </div>
 </template>

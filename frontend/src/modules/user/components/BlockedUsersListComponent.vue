@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import type { User } from '@/models/user-model';
+import type { User } from '@/modules/user/models/user-model';
 import { API_URL } from '@/config/env';
 import axios from 'axios';
 import UserCardComponent from './UserCardComponent.vue';
@@ -8,7 +8,6 @@ import UserCardComponent from './UserCardComponent.vue';
 const blockedUsersList = ref<User[]>((await axios.get(`${API_URL}/user/block`)).data);
 
 const unblockUser = (username: string) => {
-  console.log(blockedUsersList.value);
   const filteredUsers = blockedUsersList.value.filter(
     (user) => user.username === username
   );

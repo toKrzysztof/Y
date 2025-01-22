@@ -2,9 +2,10 @@ const userPostRoutes = require('express').Router();
 const { acquireDbSession, closeDbSession } = require('../../../db/db-tools');
 const {
   getPostsMadeByUser,
-  getPostsOfFollowees,
-  getPostsWithFirstLevelComments,
-  createPost
+  getPostsOfFollowedUsers,
+  getRandomPostsWithFirstLevelComments,
+  createPost,
+  deletePost
 } = require('../../../db/queries/post-queries');
 const { dbSessionPool } = require('../../../server');
 
@@ -12,10 +13,11 @@ const { dbSessionPool } = require('../../../server');
 userPostRoutes.get('/post/own-post', async (req, res) => {
   try {
     const { userId } = req.user;
+    const { skip, limit } = req.query;
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await getPostsMadeByUser(session, userId);
-    closeDbSession(session);
+    const data = await getPostsMadeByUser(session, userId, skip, limit);
 
+    closeDbSession(session);
     res.status(200).send(data);
   } catch (err) {
     console.log(err);
@@ -23,12 +25,13 @@ userPostRoutes.get('/post/own-post', async (req, res) => {
   }
 });
 
-// posts from all non-blocked users
+// random posts from non-blocked users
 userPostRoutes.get('/post', async (req, res) => {
   try {
     const { userId } = req.user;
+    const limit = 10;
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await getPostsWithFirstLevelComments(session, userId);
+    const data = await getRandomPostsWithFirstLevelComments(session, userId, limit);
     closeDbSession(session);
 
     res.status(200).send(data);
@@ -39,11 +42,12 @@ userPostRoutes.get('/post', async (req, res) => {
 });
 
 // posts of followed users
-userPostRoutes.get('/post/folowee', async (req, res) => {
+userPostRoutes.get('/post/follow', async (req, res) => {
   try {
     const { userId } = req.user;
+    const { skip, limit } = req.query;
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await getPostsOfFollowees(session, userId);
+    const data = await getPostsOfFollowedUsers(session, userId, skip, limit);
     closeDbSession(session);
 
     res.status(200).send(data);
@@ -63,9 +67,9 @@ userPostRoutes.post('/post', async (req, res) => {
         .send({ message: 'A maximum number of 3 links is allowed!' });
     }
 
-    const { userId } = req.user;
+    const { userId, username } = req.user;
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await createPost(session, title, content, links, userId);
+    const data = await createPost(session, title, content, links, userId, username);
     closeDbSession(session);
 
     res.status(200).send(data);

@@ -2,7 +2,7 @@ const findUser = async (session, username) => {
   return await session
     .query(
       `
-    SELECT @rid as id, userName FROM User 
+    SELECT @rid as id, password FROM User 
     WHERE username = :username
   `,
       { params: { username } }
@@ -148,6 +148,18 @@ const blockUser = async (session, userId, blockedUsername) => {
       params: { userId, blockedUsername }
     })
     .one();
+
+  // unfollow user on block
+  await session
+    .command(
+      `
+    DELETE EDGE Follows 
+    WHERE out.@rid = :userId 
+    AND in.username = :unfollowedUsername
+  `,
+      { params: { userId, unfollowedUsername: blockedUsername } }
+    )
+    .all();
 
   if (!existingEdge) {
     return await session

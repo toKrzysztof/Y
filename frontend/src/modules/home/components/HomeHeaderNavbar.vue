@@ -10,7 +10,7 @@
   </header>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .x-center {
   display: flex;
   justify-content: center;

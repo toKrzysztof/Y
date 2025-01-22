@@ -61,7 +61,7 @@ authRoutes.post('/auth/login', async (req, res) => {
     }
 
     // TODO - implement refresh tokens
-    const token = jwt.sign({ userId: user['@rid'] }, jwtSecret, {
+    const token = jwt.sign({ userId: user.id, username }, jwtSecret, {
       expiresIn: '1h'
     });
 
