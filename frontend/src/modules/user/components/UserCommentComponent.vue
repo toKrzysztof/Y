@@ -14,7 +14,7 @@ const onClick = (commentId: string) => {
 <template>
   <article class="user-comment">
     <div class="user-comment-content">
-      <span class="user-comment-author-username">{{ comment.username }}</span>
+      <span class="user-comment-author-username">{{ comment.username }}</span><button></button>
       <span>{{ comment.content }}</span>
     </div>
     <div class="user-comment-footer">
