@@ -126,13 +126,14 @@ const getCommentReplies = async (session, commentId, limit, skip) => {
     .query(
       `
 SELECT LIST(*) as content, COUNT(*) as count FROM (
-MATCH {Class: Comment, as: comment, where: (@rid = :commentId)}-HasComment->{Class: Comment, as: reply}
+MATCH {Class: Comment, as: comment, where: (@rid = :commentId)}-HasComment->{Class: Comment, as: reply}<-MadeComment-{Class: User, as: user}
     RETURN
     reply.@rid as id,
     reply.createdAt as createdAt,
     reply.updatedAt as updatedAt,
     reply.content as content,
-    reply.username as username
+    reply.username as username,
+    user.in("Follows") as follows
     GROUP BY createdAt ORDER BY createdAt DESC
     SKIP :skip LIMIT :limit)
   `,

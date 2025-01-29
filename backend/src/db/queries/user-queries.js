@@ -78,9 +78,12 @@ const createUser = async (session, firstName, lastName, username, password) => {
 
 const followUser = async (session, userId, followedUsername) => {
   const existingEdge = await session
-    .query(`SELECT FROM Follows WHERE out = :userId AND in = :followedUsername`, {
-      params: { userId, followedUsername }
-    })
+    .query(
+      `SELECT FROM (SELECT expand(in) FROM Follows WHERE out = :userId) WHERE username = :followedUsername`,
+      {
+        params: { userId, followedUsername }
+      }
+    )
     .one();
 
   if (!existingEdge) {
@@ -111,13 +114,22 @@ const unfollowUser = async (session, userId, unfollowedUsername) => {
 
 const muteUser = async (session, userId, mutedUsername) => {
   const existingEdge = await session
-    .query(`SELECT FROM Mutes WHERE out = :userId AND in = :mutedUsername`, {
-      params: { userId, mutedUsername }
-    })
+    .query(
+      `SELECT FROM (SELECT expand(in) FROM Mutes WHERE out = :userId) WHERE username = :mutedUsername`,
+      {
+        params: { userId, mutedUsername }
+      }
+    )
     .one();
 
   if (!existingEdge) {
-    return await session.create().one();
+    const query = injectRid(
+      `CREATE EDGE Mutes FROM :userId TO (SELECT FROM User WHERE username = :mutedUsername)`,
+      'userId',
+      userId
+    );
+
+    return await session.command(query, { params: { mutedUsername } }).one();
   }
 
   return null; // Edge already exists
@@ -138,9 +150,12 @@ const unmuteUser = async (session, userId, unmutedUsername) => {
 
 const blockUser = async (session, userId, blockedUsername) => {
   const existingEdge = await session
-    .query(`SELECT FROM Blocks WHERE out = :userId AND in = :blockedUsername`, {
-      params: { userId, blockedUsername }
-    })
+    .query(
+      `SELECT FROM (SELECT expand(in) FROM Blocks WHERE out = :userId) WHERE username = :blockedUsername`,
+      {
+        params: { userId, blockedUsername }
+      }
+    )
     .one();
 
   // unfollow user on block
@@ -156,14 +171,13 @@ const blockUser = async (session, userId, blockedUsername) => {
     .all();
 
   if (!existingEdge) {
-    return await session
-      .command(
-        `CREATE EDGE Blocks FROM (SELECT FROM V WHERE @rid = :userId) TO (SELECT FROM V WHERE username = :blockedUsername)`,
-        {
-          params: { userId, blockedUsername }
-        }
-      )
-      .one();
+    const query = injectRid(
+      `CREATE EDGE Blocks FROM :userId TO (SELECT FROM User WHERE username = :blockedUsername)`,
+      'userId',
+      userId
+    );
+
+    return await session.command(query, { params: { blockedUsername } }).one();
   }
 
   return null; // Edge already exists

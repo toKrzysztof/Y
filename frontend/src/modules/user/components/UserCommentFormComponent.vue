@@ -8,6 +8,7 @@ interface CommentProps {
 }
 
 const props = defineProps<{ commentProps: CommentProps }>();
+console.log(props);
 
 const submit = (content: string) => {
   axios
@@ -25,7 +26,7 @@ const submit = (content: string) => {
 
 <template>
   <article class="register-form-panel">
-    <h1>Register</h1>
+    <h1>Make a comment...</h1>
     <FormKit type="form" :actions="false" @submit="submit">
       <FormKit
         type="text"

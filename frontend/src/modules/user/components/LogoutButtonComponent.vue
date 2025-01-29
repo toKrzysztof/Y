@@ -7,6 +7,10 @@ const onClick = async () => {
   axios
     .post(`${API_URL}/auth/logout`)
     .then(() => {
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
+      localStorage.removeItem('followedUsers');
+      localStorage.removeItem('blockedUsers');
       router.push('/home/login');
     })
     .catch(console.log);

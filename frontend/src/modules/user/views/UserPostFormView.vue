@@ -49,7 +49,6 @@ const submit = ({ title, content }: PostFormData) => {
       />
       <FormKit type="text" name="content" label="Content" validation="required" />
 
-      <FormKit type="text" name="content" label="Content" validation="required" />
       <div class="flex">
         <FormKit
           type="text"

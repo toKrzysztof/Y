@@ -12,7 +12,9 @@ const props = defineProps<{ commentList: Comment[] }>();
       <UserCommentComponent :comment="comment"></UserCommentComponent>
     </li>
     <p v-show="commentList.length === 0">No comments yet...</p>
-    <!-- <UserCommentFormComponent :comment-props="{parentId}"></UserCommentFormComponent> -->
+    <UserCommentFormComponent
+      :comment-props="{ ...comment }"
+    ></UserCommentFormComponent>
   </ol>
 </template>
 <style lang="scss" scoped>

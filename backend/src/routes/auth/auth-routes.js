@@ -3,7 +3,12 @@ const jwt = require('jsonwebtoken');
 const { verifyToken } = require('../../utils/verifyToken');
 const authRoutes = express.Router();
 const { genHash, cmpHash } = require('../../config/hash-config');
-const { createUser, findUser } = require('../../db/queries/user-queries');
+const {
+  createUser,
+  findUser,
+  findFollowedUsers,
+  findBlockedUsers
+} = require('../../db/queries/user-queries');
 const { acquireDbSession, closeDbSession } = require('../../db/db-tools');
 const { dbSessionPool } = require('../../server');
 
@@ -65,6 +70,9 @@ authRoutes.post('/auth/login', async (req, res) => {
       expiresIn: '1h'
     });
 
+    const followedUsers = await findFollowedUsers(session, user.id);
+    const blockedUsers = await findBlockedUsers(session, user.id);
+
     res.cookie('auth-token', token, {
       httpOnly: true,
       sameSite: 'strict'
@@ -73,7 +81,9 @@ authRoutes.post('/auth/login', async (req, res) => {
     res.status(200).json({
       message: 'The authentication was successful!',
       username,
-      userId: user.userId
+      userId: user.id,
+      followedUsers,
+      blockedUsers
     });
   } catch (err) {
     console.log(err);

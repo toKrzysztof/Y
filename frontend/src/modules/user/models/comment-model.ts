@@ -4,4 +4,5 @@ export interface Comment {
   updatedAt: string;
   content: string;
   username: string;
+  follows: string[];
 }

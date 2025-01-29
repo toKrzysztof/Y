@@ -9,6 +9,7 @@ import UserMainCommentComponent from '../components/UserMainCommentComponent.vue
 import UserCommentListComponent from '../components/UserCommentListComponent.vue';
 import type { Comment } from '../models/comment-model';
 import router from '@/router';
+import { isUserBlocked } from '../utils/userRelationshipsStorageUtils';
 
 const comment = ref({
   id: '',
@@ -46,7 +47,7 @@ const routeBack = () => {
     </template>
     <template #itemList="{ itemList }">
       <UserCommentListComponent
-        :comment-list="(itemList as Comment[])"
+        :comment-list="(itemList as Comment[]).filter(comment => !isUserBlocked(comment.username))"
       ></UserCommentListComponent>
     </template>
   </InfiniteScrollPageComponent>

@@ -6,28 +6,28 @@ import LogoutButtonComponent from './LogoutButtonComponent.vue';
     <ul class="navigation">
       <li>
         <a class="link-icon" href="/user/create-post">
-          <i class="fa-solid fa-plus"></i><span>Create post</span>
+          <span>Create post</span>
         </a>
       </li>
       <li>
         <!-- TODO - swap for routerlink -->
         <a class="link-icon" href="/user/my-feed">
-          <i class="fa-solid fa-house"></i><span>My feed</span>
+          <span>My feed</span>
         </a>
       </li>
       <li>
         <a class="link-icon" href="/user/explore">
-          <i class="fa-solid fa-compass"></i><span>Explore</span>
+          <span>Explore</span>
         </a>
       </li>
       <li>
         <a class="link-icon" href="/user/chat">
-          <i class="fa-solid fa-comment-dots"></i><span>Chat</span>
+          <span>Chat</span>
         </a>
       </li>
       <li>
         <a class="link-icon" href="/user/profile">
-          <i class="fa-solid fa-user"></i><span>My profile</span>
+          <span>My profile</span>
         </a>
       </li>
     </ul>

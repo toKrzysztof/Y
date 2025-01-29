@@ -66,29 +66,58 @@ const getPostsMadeByUser = async (session, userId, skip, limit) => {
 };
 
 const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
+  // crashes whole db connection but works in db gui client :-)
+  //   return (
+  //     (await session
+  //       .query(
+  //         `SELECT LIST(*) as content, COUNT(*) as count FROM (SELECT username, firstName, lastName, postId, title, content, createdAt, updatedAt, if(eval("comments[0].id IS NULL"), [], comments) as comments
+  //       FROM (MATCH {Class: User, as: user, where: (@rid = :userId)}-Follows->{Class: User, as: follow}-HasPost->{Class: Post, as: post}-HasComment->{Class: Comment, as: comment, optional: true}<-MadeComment-{Class: User, as: commentAuthor}
+  //       RETURN
+  //       follow.username as username,
+  //       follow.firstName as firstName,
+  //       follow.lastName as lastName,
+  //       post.@rid as postId,
+  //       post.title as title,
+  //       post.content as content,
+  //       post.createdAt as createdAt,
+  //       post.updatedAt as updatedAt,
+  //       set({
+  //                 "id": comment.@rid,
+  //                 "createdAt": comment.createdAt,
+  //                 "content": comment.content,
+  //                 "updatedAt": comment.updatedAt,
+  //                 "username": comment.username,
+  //                 "follows": commentAuthor.in("Follows") as follows
+  //             }) AS comments
+  //         GROUP BY postId
+  // ) GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit)`,
+  //         { params: { userId, skip: parseInt(skip), limit: parseInt(limit) } }
+  //       )
+  //       .one()) || { count: 0, content: [] }
+  //   );
   return (
     (await session
       .query(
         `SELECT LIST(*) as content, COUNT(*) as count FROM (SELECT username, firstName, lastName, postId, title, content, createdAt, updatedAt, if(eval("comments[0].id IS NULL"), [], comments) as comments
-      FROM (MATCH {Class: User, as: user, where: (@rid = :userId)}-Follows->{Class: User, as: follow}-HasPost->{Class: Post, as: post}-HasComment->{Class: Comment, as: comment, optional: true}
-      RETURN
-      follow.username as username,
-      follow.firstName as firstName,
-      follow.lastName as lastName,
-      post.@rid as postId,
-      post.title as title,
-      post.content as content,
-      post.createdAt as createdAt,
-      post.updatedAt as updatedAt,
-      set({
-                "id": comment.@rid,
-                "createdAt": comment.createdAt,
-                "content": comment.content,
-                "updatedAt": comment.updatedAt,
-                "username": comment.username
-            }) AS comments
-        GROUP BY postId
-) GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit)`,
+        FROM (MATCH {Class: User, as: user, where: (@rid = :userId)}-Follows->{Class: User, as: follow}-HasPost->{Class: Post, as: post}-HasComment->{Class: Comment, as: comment, optional: true}
+        RETURN
+        follow.username as username,
+        follow.firstName as firstName,
+        follow.lastName as lastName,
+        post.@rid as postId,
+        post.title as title,
+        post.content as content,
+        post.createdAt as createdAt,
+        post.updatedAt as updatedAt,
+        set({
+                  "id": comment.@rid,
+                  "createdAt": comment.createdAt,
+                  "content": comment.content,
+                  "updatedAt": comment.updatedAt,
+                  "username": comment.username
+              }) AS comments
+          GROUP BY postId
+  ) GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit)`,
         { params: { userId, skip: parseInt(skip), limit: parseInt(limit) } }
       )
       .one()) || { count: 0, content: [] }

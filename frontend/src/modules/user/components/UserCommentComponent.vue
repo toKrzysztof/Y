@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import router from '@/router';
 import type { Comment } from '../models/comment-model';
+import UserActionsTile from './UserActionsTile.vue';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<{ comment: Comment }>();
 
 const onClick = (commentId: string) => {
-  console.log('test');
-  console.log(commentId);
   router.push(`/user/comment/${btoa(commentId)}`);
 };
 </script>
 <template>
   <article class="user-comment">
     <div class="user-comment-content">
-      <span class="user-comment-author-username">{{ comment.username }}</span><button></button>
+      <span class="user-comment-author-username">{{ comment.username }}</span
+      ><UserActionsTile :username="comment.username"></UserActionsTile>
       <span>{{ comment.content }}</span>
     </div>
     <div class="user-comment-footer">

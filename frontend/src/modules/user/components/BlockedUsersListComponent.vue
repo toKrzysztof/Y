@@ -4,18 +4,19 @@ import type { User } from '@/modules/user/models/user-model';
 import { API_URL } from '@/config/env';
 import axios from 'axios';
 import UserCardComponent from './UserCardComponent.vue';
+import { removeUserBlocked } from '../utils/userRelationshipsStorageUtils';
 
 const blockedUsersList = ref<User[]>((await axios.get(`${API_URL}/user/block`)).data);
 
 const unblockUser = (username: string) => {
   const filteredUsers = blockedUsersList.value.filter(
-    (user) => user.username === username
+    (user) => user.username !== username
   );
   blockedUsersList.value = filteredUsers;
   axios
     .delete(`${API_URL}/user/block/${username}`)
     .then((res) => {
-      console.log(res);
+      removeUserBlocked(username);
     })
     .catch((e) => console.log(e));
 };
@@ -27,7 +28,7 @@ const unblockUser = (username: string) => {
     <li v-for="user in blockedUsersList" v-bind:key="user.id" class="flex">
       <UserCardComponent :user="user"></UserCardComponent
       ><button class="button-small" @click="() => unblockUser(user.username)">
-        unfollow
+        Unblock
       </button>
     </li>
   </ul>

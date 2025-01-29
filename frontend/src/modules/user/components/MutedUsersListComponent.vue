@@ -10,7 +10,7 @@ const mutedUsersList = ref<User[]>((await axios.get(`${API_URL}/user/mute`)).dat
 const unmuteUser = (username: string) => {
   console.log(mutedUsersList.value);
   const filteredUsers = mutedUsersList.value.filter(
-    (user) => user.username === username
+    (user) => user.username !== username
   );
   mutedUsersList.value = filteredUsers;
   axios

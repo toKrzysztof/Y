@@ -11,7 +11,16 @@ interface LoginCredentials {
 const submit = ({ username, password }: LoginCredentials) => {
   axios
     .post(`${API_URL}/auth/login`, { username, password })
-    .then(() => {
+    .then((res) => {
+      console.log(res);
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
+      localStorage.removeItem('followedUsers');
+      localStorage.removeItem('blockedUsers');
+      localStorage.setItem('userId', res.data.userId);
+      localStorage.setItem('username', res.data.username);
+      localStorage.setItem('followedUsers', JSON.stringify(res.data.followedUsers));
+      localStorage.setItem('blockedUsers', JSON.stringify(res.data.blockedUsers));
       router.push('/user/my-feed');
     })
     .catch((e) => {

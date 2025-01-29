@@ -1,21 +1,27 @@
 <script setup lang="ts">
 import type { Post } from '@/modules/user/models/post-model';
 import UserCommentListComponent from './UserCommentListComponent.vue';
-import FollowUserTile from './FollowUserTile.vue';
+import UserActionsTile from './UserActionsTile.vue';
+import { isUserBlocked } from '../utils/userRelationshipsStorageUtils';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _ = defineProps<{ post: Post }>();
+const ownUsername = localStorage.getItem('username');
 </script>
 <template>
   <article class="user-post">
     <div class="user-post-data">
       <header class="user-post-header">
         <h3>{{ post.title }}</h3>
-        <FollowUserTile :username="post.username"></FollowUserTile>
+        <UserActionsTile :username="post.username"></UserActionsTile>
       </header>
       <p class="user-post-content">{{ post.content }}</p>
       <div class="user-post-created-at">{{ $formattedDate(post.createdAt) }}</div>
     </div>
-    <UserCommentListComponent :comment-list="post.comments"></UserCommentListComponent>
+    <UserCommentListComponent
+      :comment-list="
+        post.comments.filter((comment) => !isUserBlocked(comment.username))
+      "
+    ></UserCommentListComponent>
   </article>
 </template>
 <style lang="scss" scoped>

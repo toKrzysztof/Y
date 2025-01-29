@@ -31,6 +31,7 @@ import { API_URL } from '@/config/env';
         <BlockedUsersListComponent></BlockedUsersListComponent>
         <template #fallback><p>Loading...</p></template>
       </Suspense>
+      <h2>My posts</h2>
     </template>
 
     <template #itemList="{ itemList }">
