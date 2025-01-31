@@ -25,6 +25,11 @@ userFollowRoutes.post('/follow/:followUsername', async (req, res) => {
   try {
     const { userId } = req.user;
     const { followUsername } = req.params;
+    const ownUsername = req.user.username;
+
+    if (ownUsername === followUsername) {
+      res.status(403).send('FORBIDDEN');
+    }
     const session = await acquireDbSession(await dbSessionPool);
     const data = await followUser(session, userId, followUsername);
     closeDbSession(session);

@@ -25,6 +25,11 @@ userBlockRoutes.post('/block/:blockUsername', async (req, res) => {
   try {
     const { userId } = req.user;
     const { blockUsername } = req.params;
+    const ownUsername = req.user.username;
+
+    if (ownUsername === blockUsername) {
+      res.status(403).send('FORBIDDEN');
+    }
     const session = await acquireDbSession(await dbSessionPool);
     const data = await blockUser(session, userId, blockUsername);
     closeDbSession(session);

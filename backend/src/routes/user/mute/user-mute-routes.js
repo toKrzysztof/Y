@@ -24,7 +24,7 @@ userMuteRoutes.get('/mute', async (req, res) => {
 userMuteRoutes.post('/mute/:muteUsername', async (req, res) => {
   try {
     const { userId } = req.user;
-    const { muteUsername } = req.user;
+    const { muteUsername } = req.params;
     const session = await acquireDbSession(await dbSessionPool);
     const data = await muteUser(session, userId, muteUsername);
     closeDbSession(session);

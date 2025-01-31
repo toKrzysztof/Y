@@ -29,7 +29,7 @@ const submit = ({ title, content }: PostFormData) => {
   axios
     .post(`${API_URL}/user/post`, { title, content, links: links.value })
     .then(() => {
-      router.push('/user/my-feed');
+      router.push('/user/profile');
     })
     .catch((e) => {
       console.log(`e: ${e}`);
