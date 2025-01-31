@@ -14,7 +14,7 @@ interface Props<T> {
   baseFetchUrl: string;
 }
 
-const profilePageContentWrapperElement = ref(null);
+const pageContentWrapper = ref(null);
 const itemList = ref<unknown[]>([]);
 const itemCount = ref<number | null>(null);
 const fetchingData = ref<boolean>(false);
@@ -41,8 +41,6 @@ onMounted(() => {
 
 const getItemsOnScroll = async () => {
   try {
-    await new Promise((res) => setTimeout(res, 2000));
-
     const newItems = await fetchData(baseFetchUrl, postsPerPage, itemList.value.length);
 
     itemList.value.push(...newItems.content);
@@ -53,13 +51,14 @@ const getItemsOnScroll = async () => {
 };
 
 useInfiniteScroll(
-  profilePageContentWrapperElement,
+  pageContentWrapper,
   async () => {
     await getItemsOnScroll();
   },
   {
-    distance: 200,
+    distance: 50,
     canLoadMore: () => {
+      console.log('test');
       if (fetchingData.value === true) return false;
       if (
         typeof itemCount.value === 'number' &&
@@ -74,7 +73,7 @@ useInfiniteScroll(
 </script>
 
 <template>
-  <div ref="profilePageContentWrapperElement" class="scroll-page-content-wrapper">
+  <div ref="pageContentWrapper" class="scroll-page-content-wrapper">
     <Suspense>
       <slot name="regular-content"></slot>
       <template #fallback>Loading...</template>
@@ -105,6 +104,7 @@ useInfiniteScroll(
   height: 100vh;
   overflow-y: scroll;
   width: 100%;
+  padding-bottom: 2rem;
 }
 
 .item-list {

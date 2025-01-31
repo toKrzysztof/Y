@@ -13,8 +13,7 @@ const onClick = (commentId: string) => {
 <template>
   <article class="user-comment">
     <div class="user-comment-content">
-      <span class="user-comment-author-username">{{ comment.username }}</span
-      ><UserActionsTile :username="comment.username"></UserActionsTile>
+      <UserActionsTile :username="comment.username"></UserActionsTile>
       <span>{{ comment.content }}</span>
     </div>
     <div class="user-comment-footer">
@@ -43,6 +42,7 @@ const onClick = (commentId: string) => {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding-bottom: 0.5rem;
 }
 
 .user-comment-author-username {

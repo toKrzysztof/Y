@@ -24,7 +24,8 @@ const unfollowUser = (username: string) => {
 
 <template>
   <h2>Followed users:</h2>
-  <ul class="followed-users-list">
+  <div v-show="followedUsersList.length === 0">No followed users yet...</div>
+  <ul v-if="followedUsersList.length > 0" class="followed-users-list">
     <li v-for="user in followedUsersList" v-bind:key="user.id" class="flex">
       <UserCardComponent :user="user"></UserCardComponent
       ><button class="button-small" @click="() => unfollowUser(user.username)">

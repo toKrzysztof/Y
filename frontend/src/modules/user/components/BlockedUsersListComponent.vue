@@ -24,7 +24,8 @@ const unblockUser = (username: string) => {
 
 <template>
   <h2>Blocked users:</h2>
-  <ul class="blocked-users-list">
+  <div v-show="blockedUsersList.length === 0">No users blocked.</div>
+  <ul class="blocked-users-list" v-if="blockedUsersList.length > 0">
     <li v-for="user in blockedUsersList" v-bind:key="user.id" class="flex">
       <UserCardComponent :user="user"></UserCardComponent
       ><button class="button-small" @click="() => unblockUser(user.username)">

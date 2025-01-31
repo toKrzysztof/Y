@@ -10,10 +10,11 @@ const findComment = async (session, commentId) => {
   return await session.query(query).one();
 };
 
+// TODO - flip username and parentId, should be parendAuthorUsername and userId
 const createComment = async (session, content, userId, parentId, username) => {
   const comment = await session
     .command(
-      'INSERT INTO Comment SET username = :username, content = :content, createdAt = :now, updatedAt = :now',
+      'CREATE VERTEX Comment SET username = :username, content = :content, createdAt = :now, updatedAt = :now',
       { params: { content, userId, now: new Date(), username } }
     )
     .one();
@@ -30,10 +31,10 @@ const createComment = async (session, content, userId, parentId, username) => {
   await session
     .command(
       injectRid(
-        'CREATE EDGE HasComment FROM :parentId TO (SELECT FROM Comment WHERE @rid = :commentId)',
-        'parentId'
+        'CREATE EDGE HasComment FROM :parentId TO :commentId',
+        'parentId',
+        parentId
       ),
-      parentId,
       { params: { commentId: comment['@rid'] } }
     )
     .one();
@@ -122,11 +123,17 @@ const deleteComment = async (session, commentId) => {
 
 // TODO - exclude comments from blocked users (maybe)
 const getCommentReplies = async (session, commentId, limit, skip) => {
-  return await session
+  const totalRecords = await session
     .query(
-      `
-SELECT LIST(*) as content, COUNT(*) as count FROM (
-MATCH {Class: Comment, as: comment, where: (@rid = :commentId)}-HasComment->{Class: Comment, as: reply}<-MadeComment-{Class: User, as: user}
+      `MATCH {Class: Comment, as: comment, where: (@rid = :commentId)}-HasComment->{Class: Comment, as: reply} return COUNT(*) as totalRecords`,
+
+      { params: { commentId, skip: parseInt(skip), limit: parseInt(limit) } }
+    )
+    .one();
+
+  const content = await session
+    .query(
+      `MATCH {Class: Comment, as: comment, where: (@rid = :commentId)}-HasComment->{Class: Comment, as: reply}<-MadeComment-{Class: User, as: user}
     RETURN
     reply.@rid as id,
     reply.createdAt as createdAt,
@@ -135,11 +142,13 @@ MATCH {Class: Comment, as: comment, where: (@rid = :commentId)}-HasComment->{Cla
     reply.username as username,
     user.in("Follows") as follows
     GROUP BY createdAt ORDER BY createdAt DESC
-    SKIP :skip LIMIT :limit)
+    SKIP :skip LIMIT :limit
   `,
       { params: { commentId, skip: parseInt(skip), limit: parseInt(limit) } }
     )
-    .one();
+    .all();
+
+  return { content, count: totalRecords.totalRecords };
 };
 
 module.exports = {

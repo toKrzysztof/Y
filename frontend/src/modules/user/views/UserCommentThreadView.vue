@@ -15,12 +15,10 @@ const comment = ref({
   id: '',
   username: '',
   content: '',
-  createdAt: '2025-01-01',
-  updatedAt: '2025-01-01'
+  createdAt: '2025-01-01'
 });
 const route = useRoute();
 const commentId = route.params.commentId;
-console.log(commentId);
 
 onMounted(() => {
   axios
@@ -36,23 +34,27 @@ const routeBack = () => {
 };
 </script>
 <template>
-  <button @click="routeBack" class="button-small">Back</button>
   <InfiniteScrollPageComponent
     :fetch-data="getCommentThreadReplies"
     :posts-per-page="10"
     :base-fetch-url="`${API_URL}/user/comment/${commentId}/comment`"
   >
     <template #regular-content>
+      <header>
+        <button @click="routeBack" class="button-small">Back</button>
+      </header>
       <UserMainCommentComponent :comment="comment"></UserMainCommentComponent>
     </template>
     <template #itemList="{ itemList }">
       <UserCommentListComponent
         :comment-list="(itemList as Comment[]).filter(comment => !isUserBlocked(comment.username))"
+        :parent-id="comment.id"
       ></UserCommentListComponent>
     </template>
   </InfiniteScrollPageComponent>
 </template>
 <style lang="scss" scoped>
-.apply {
+header {
+  padding: 1rem 0;
 }
 </style>

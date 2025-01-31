@@ -3,7 +3,7 @@ const { injectRid } = require('../orientjs/db-query-param-injectors');
 const createPost = async (session, title, content, links, userId, username) => {
   const post = await session
     .command(
-      'INSERT INTO Post SET username = :username, title = :title, content = :content, createdAt = :now, updatedAt = :now, links = :links',
+      'CREATE VERTEX Post SET username = :username, title = :title, content = :content, createdAt = :now, updatedAt = :now, links = :links',
       { params: { title, content, now: new Date(), links, username } }
     )
     .one();
@@ -36,10 +36,27 @@ const deletePost = async (session, postId) => {
 };
 
 const getPostsMadeByUser = async (session, userId, skip, limit) => {
-  return (
-    (await session
-      .query(
-        `SELECT LIST(*) as content, COUNT(*) as count FROM (SELECT username, firstName, lastName, postId, title, content, createdAt, updatedAt, if(eval("comments[0].id IS NULL"), [], comments) as comments
+  // returns 0 even though there are records
+  // const totalRecords = await session
+  //   .query(
+  //     `SELECT COUNT(*) as totalRecords FROM Post WHERE in('HasPost').@rid = :userId`,
+  //     { params: { userId } }
+  //   )
+  //   .one();
+
+  const totalRecords = await session
+    .query(
+      injectRid(
+        `SELECT COUNT(*) as totalRecords FROM Post WHERE in('HasPost').@rid = :userId`,
+        'userId',
+        userId
+      )
+    )
+    .one();
+
+  const content = await session
+    .query(
+      `SELECT username, firstName, lastName, postId, title, content, createdAt, updatedAt, links, if(eval("comments[0].id IS NULL"), [], comments) as comments
       FROM (MATCH {Class: User, as: user, where: (@rid = :userId)}-HasPost->{Class: Post, as: post}-HasComment->{Class: Comment, as: comment, optional: true}
       RETURN
       user.username as username,
@@ -50,6 +67,7 @@ const getPostsMadeByUser = async (session, userId, skip, limit) => {
       post.content as content,
       post.createdAt as createdAt,
       post.updatedAt as updatedAt,
+      post.links as links,
       set({
                 "id": comment.@rid,
                 "createdAt": comment.createdAt,
@@ -58,14 +76,25 @@ const getPostsMadeByUser = async (session, userId, skip, limit) => {
                 "username": comment.username
             }) AS comments
         GROUP BY postId
-) GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit)`,
-        { params: { userId, skip: parseInt(skip), limit: parseInt(limit) } }
-      )
-      .one()) || { count: 0, content: [] }
-  );
+) GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
+      { params: { userId, skip: parseInt(skip), limit: parseInt(limit) } }
+    )
+    .all();
+
+  return { count: totalRecords.totalRecords, content: content };
 };
 
 const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
+  const totalRecords = await session
+    .query(
+      injectRid(
+        `MATCH {Class: User, as: user, where: (@rid = :userId)}-Follows->{Class: User, as: follow}-HasPost->{Class: Post, as: post} RETURN COUNT(*) as totalRecords`,
+        'userId',
+        userId
+      )
+    )
+    .one();
+
   // crashes whole db connection but works in db gui client :-)
   //   return (
   //     (await session
@@ -95,10 +124,9 @@ const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
   //       )
   //       .one()) || { count: 0, content: [] }
   //   );
-  return (
-    (await session
-      .query(
-        `SELECT LIST(*) as content, COUNT(*) as count FROM (SELECT username, firstName, lastName, postId, title, content, createdAt, updatedAt, if(eval("comments[0].id IS NULL"), [], comments) as comments
+  const content = await session
+    .query(
+      `SELECT username, firstName, lastName, postId, title, content, createdAt, updatedAt, links, if(eval("comments[0].id IS NULL"), [], comments) as comments
         FROM (MATCH {Class: User, as: user, where: (@rid = :userId)}-Follows->{Class: User, as: follow}-HasPost->{Class: Post, as: post}-HasComment->{Class: Comment, as: comment, optional: true}
         RETURN
         follow.username as username,
@@ -109,6 +137,7 @@ const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
         post.content as content,
         post.createdAt as createdAt,
         post.updatedAt as updatedAt,
+        post.links AS links,
         set({
                   "id": comment.@rid,
                   "createdAt": comment.createdAt,
@@ -117,11 +146,12 @@ const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
                   "username": comment.username
               }) AS comments
           GROUP BY postId
-  ) GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit)`,
-        { params: { userId, skip: parseInt(skip), limit: parseInt(limit) } }
-      )
-      .one()) || { count: 0, content: [] }
-  );
+  ) GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
+      { params: { userId, skip: parseInt(skip), limit: parseInt(limit) } }
+    )
+    .all();
+
+  return { count: totalRecords.totalRecords, content: content };
 };
 
 // Get Post with Comments 1 level deep
@@ -147,6 +177,7 @@ const getRandomPostsWithFirstLevelComments = async (session, userId, limit) => {
             post.title AS title,
             post.content AS content,
             post.updatedAt AS updatedAt,
+            post.links AS links,
             author.username as username,
             author.firstName as firstName,
             author.lastName as lastName,

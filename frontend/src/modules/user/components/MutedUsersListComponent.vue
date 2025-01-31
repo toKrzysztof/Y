@@ -24,7 +24,8 @@ const unmuteUser = (username: string) => {
 
 <template>
   <h2>Muted users:</h2>
-  <ul class="muted-users-list">
+  <div v-show="mutedUsersList.length === 0">No users blocked.</div>
+  <ul class="blocked-users-list" v-if="mutedUsersList.length > 0">
     <li v-for="user in mutedUsersList" v-bind:key="user.id" class="flex">
       <UserCardComponent :user="user"></UserCardComponent
       ><button class="button-small" @click="() => unmuteUser(user.username)">

@@ -5,7 +5,6 @@ import UserActionsTile from './UserActionsTile.vue';
 import { isUserBlocked } from '../utils/userRelationshipsStorageUtils';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _ = defineProps<{ post: Post }>();
-const ownUsername = localStorage.getItem('username');
 </script>
 <template>
   <article class="user-post">
@@ -16,11 +15,25 @@ const ownUsername = localStorage.getItem('username');
       </header>
       <p class="user-post-content">{{ post.content }}</p>
       <div class="user-post-created-at">{{ $formattedDate(post.createdAt) }}</div>
+      <div>
+        <ol class="post-links-list">
+          <h4>Links:</h4>
+          <span v-show="post.links.length === 0" class="no-links-message"
+            >No links attached...</span
+          >
+          <div v-if="post.links.length > 0">
+            <li v-for="(link, index) in post.links" v-bind:key="index">
+              <a :href="link" class="link-normal">{{ link }}</a>
+            </li>
+          </div>
+        </ol>
+      </div>
     </div>
     <UserCommentListComponent
       :comment-list="
         post.comments.filter((comment) => !isUserBlocked(comment.username))
       "
+      :parent-id="post.postId"
     ></UserCommentListComponent>
   </article>
 </template>
@@ -52,6 +65,16 @@ const ownUsername = localStorage.getItem('username');
   align-items: center;
 }
 
-.user-post {
+.post-links-list {
+  @extend %reset-ordered-list;
+  align-items: flex-start;
+
+  .no-links-message {
+    font-size: 0.875rem;
+  }
+}
+
+h4 {
+  margin-bottom: 0.5rem;
 }
 </style>

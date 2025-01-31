@@ -69,8 +69,8 @@ const unblock = (username: string) => {
 };
 </script>
 <template>
-  <div>
-    <span>{{ username }}</span>
+  <div class="user-actions-tile">
+    <span class="user-comment-author-username">{{ username }}</span>
 
     <button
       v-if="!userFollowed && username !== ownUsername"
@@ -103,6 +103,13 @@ const unblock = (username: string) => {
   </div>
 </template>
 <style lang="scss" scoped>
-.test {
+.user-comment-author-username {
+  font-weight: 700;
+}
+
+.user-actions-tile {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
 </style>

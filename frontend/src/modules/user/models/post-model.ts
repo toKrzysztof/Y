@@ -8,6 +8,7 @@ export interface Post {
   readonly authorLastName: string;
   readonly content: string;
   readonly createdAt: string;
+  readonly links: string[];
   readonly postId: string;
   readonly title: string;
   readonly updatedAt: string;

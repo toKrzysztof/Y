@@ -13,18 +13,17 @@ services:
       - ./db/data-backup:/orientdb/backup
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:2480']
-      interval: 30s
+      interval: 15s
       timeout: 10s
       retries: 5
 
-  nginx:
+  nginx-local:
     image: nginx:stable-alpine3.20-perl
-    container_name: nginx
+    container_name: nginx-local
     ports:
-      - '80:80'
+      - '5500:5500'
     depends_on:
       orientdb:
         condition: service_healthy
     volumes:
-      # TODO - parameterize nginx-local vs nginx-prod volume mounting
       - ./nginx-local.conf:/etc/nginx/nginx.conf

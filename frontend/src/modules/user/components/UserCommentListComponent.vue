@@ -3,18 +3,19 @@ import UserCommentComponent from './UserCommentComponent.vue';
 import type { Comment } from '../models/comment-model';
 import UserCommentFormComponent from './UserCommentFormComponent.vue';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const props = defineProps<{ commentList: Comment[] }>();
+const props = defineProps<{
+  commentList: Comment[];
+  parentId: string;
+}>();
 </script>
 <template>
   <h4 class="x-center">Comments</h4>
+  <UserCommentFormComponent :parent-id="parentId"></UserCommentFormComponent>
   <ol ref="listElement" class="comment-list">
     <li v-for="comment in commentList" v-bind:key="comment.id" class="full-width">
       <UserCommentComponent :comment="comment"></UserCommentComponent>
     </li>
     <p v-show="commentList.length === 0">No comments yet...</p>
-    <UserCommentFormComponent
-      :comment-props="{ ...comment }"
-    ></UserCommentFormComponent>
   </ol>
 </template>
 <style lang="scss" scoped>

@@ -12,7 +12,6 @@ const submit = ({ username, password }: LoginCredentials) => {
   axios
     .post(`${API_URL}/auth/login`, { username, password })
     .then((res) => {
-      console.log(res);
       localStorage.removeItem('userId');
       localStorage.removeItem('username');
       localStorage.removeItem('followedUsers');

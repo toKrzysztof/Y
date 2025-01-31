@@ -8,7 +8,7 @@ const injectRid = (query, paramName, rid) => {
       throw new Error('INVALID RID PROVIDED FOR INJECTION:', rid);
     }
   } catch (err) {
-    console.error('INJECT RID ERROR:', err);
+    console.error('ERROR WHILE INJECTING RID: ', rid, '\nINJECT RID ERROR:', err);
   }
 };
 

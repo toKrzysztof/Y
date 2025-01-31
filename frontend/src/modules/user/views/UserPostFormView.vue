@@ -45,9 +45,14 @@ const submit = ({ title, content }: PostFormData) => {
         type="text"
         label="Title"
         name="title"
-        validation="required|length:5,50"
+        validation="required|length:1,100"
       />
-      <FormKit type="text" name="content" label="Content" validation="required" />
+      <FormKit
+        type="textarea"
+        name="content"
+        label="Content"
+        validation="required|length:1,200"
+      />
 
       <div class="flex">
         <FormKit
@@ -79,6 +84,11 @@ const submit = ({ title, content }: PostFormData) => {
   </article>
 </template>
 <style lang="scss" scoped>
+.post-form-panel {
+  width: 20rem;
+  display: grid;
+  place-content: center;
+}
 .flex {
   display: flex;
   gap: 0.5rem;

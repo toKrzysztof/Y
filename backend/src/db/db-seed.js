@@ -46,7 +46,7 @@ const populateClasses = (session) => {
         ]);
 
         // Create block network (in parallel)
-        await Promise.all([blockUser(session, charlie.username, bob.username)]);
+        await Promise.all([blockUser(session, charlie['@rid'], bob.username)]);
 
         // Create posts (in parallel)
         const [alicePost, bobPost] = await Promise.all([
@@ -75,7 +75,6 @@ const populateClasses = (session) => {
             'Welcome Alice! Great to see you here!',
             bob['@rid'],
             alicePost['@rid'],
-            'Post',
             bob.username
           ),
           createComment(
@@ -83,7 +82,6 @@ const populateClasses = (session) => {
             'Thanks for sharing!',
             charlie['@rid'],
             alicePost['@rid'],
-            'Post',
             charlie.username
           )
         ]);
@@ -95,7 +93,6 @@ const populateClasses = (session) => {
             'Thanks Charlie!',
             alice['@rid'],
             charlieComment['@rid'],
-            'Comment',
             alice.username
           ),
           createComment(
@@ -103,7 +100,6 @@ const populateClasses = (session) => {
             'Count me in for the picnic!',
             dave['@rid'],
             bobPost['@rid'],
-            'Post',
             dave.username
           )
         ]);

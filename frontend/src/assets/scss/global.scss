@@ -16,3 +16,17 @@
   margin: 0;
   padding: 0;
 }
+
+.w-full {
+  width: 100%;
+}
+
+::v-deep {
+  .formkit-messages {
+    list-style: none;
+    padding: 0;
+  }
+  .formkit-message {
+    color: red;
+  }
+}

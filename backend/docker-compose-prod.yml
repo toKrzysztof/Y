@@ -1,0 +1,33 @@
+services:
+  orientdb:
+    image: orientdb:3.0
+    container_name: orientdb
+    ports:
+      - '2424:2424'
+      - '2480:2480'
+    environment:
+      ORIENTDB_ROOT_PASSWORD: ${ORIENTDB_ROOT_PASSWORD}
+    volumes:
+      # - <config_path>:/orientdb/config
+      - ./db/data:/orientdb/databases
+      - ./db/data-backup:/orientdb/backup
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:2480']
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  nginx-prod:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    image: nginx-prod
+    container_name: nginx
+    ports:
+      - '5500:5500'
+    depends_on:
+      orientdb:
+        condition: service_healthy
+    volumes:
+      # TODO - parameterize nginx-local vs nginx-prod volume mounting
+      - ./nginx-local.conf:/etc/nginx/nginx.conf

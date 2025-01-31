@@ -52,7 +52,7 @@
   }
 }
 
-html body a {
+html body a:not(.link-normal) {
   @extend %link-base;
   @extend %link-interactions;
   @extend %prevent-select;
