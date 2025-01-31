@@ -26,9 +26,13 @@ const submit = (content: { content: string }) => {
   <article>
     <div v-if="!formSubmitted" class="comment-form-panel">
       <h4>Make a comment...</h4>
-      <FormKit type="form" :actions="false" @submit="submit">
-        <FormKit type="text" name="content" validation="required|length:1,200" />
-        <FormKit type="submit" />
+      <FormKit type="form" #default="disabled" @submit="submit" submit-label="Post">
+        <FormKit
+          type="text"
+          name="content"
+          validation="required|length:1,280"
+          placeholder="What is happening?!"
+        />
       </FormKit>
     </div>
     <div v-show="formSubmitted" class="comment-submitted">

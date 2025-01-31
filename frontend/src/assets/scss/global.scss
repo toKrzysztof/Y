@@ -21,7 +21,7 @@
   width: 100%;
 }
 
-::v-deep {
+:deep {
   .formkit-messages {
     list-style: none;
     padding: 0;

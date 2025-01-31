@@ -5,14 +5,9 @@ import LogoutButtonComponent from './LogoutButtonComponent.vue';
   <div class="sidebar">
     <ul class="navigation">
       <li>
-        <a class="link-icon" href="/user/create-post">
-          <span>Create post</span>
-        </a>
-      </li>
-      <li>
         <!-- TODO - swap for routerlink -->
         <a class="link-icon" href="/user/my-feed">
-          <span>My feed</span>
+          <span>Feed</span>
         </a>
       </li>
       <li>

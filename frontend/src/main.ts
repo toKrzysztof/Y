@@ -26,9 +26,25 @@ app.mixin({
     $formattedDate() {
       return (isoString: string): string => {
         const date = new Date(isoString);
-        const formattedDate = date.toISOString().slice(0, 10);
-        const formattedTime = date.toTimeString().slice(0, 8);
-        return `${formattedDate}, ${formattedTime}`;
+        const now = new Date();
+        const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+        if (diffInSeconds < 60) {
+          return `${diffInSeconds}s`;
+        }
+
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        if (diffInMinutes < 60) {
+          return `${diffInMinutes}m`;
+        }
+
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) {
+          return `${diffInHours}h`;
+        }
+
+        const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
       };
     }
   }

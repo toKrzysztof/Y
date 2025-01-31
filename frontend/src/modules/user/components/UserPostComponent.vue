@@ -1,20 +1,16 @@
 <script setup lang="ts">
 import type { Post } from '@/modules/user/models/post-model';
-import UserCommentListComponent from './UserCommentListComponent.vue';
-import UserActionsTile from './UserActionsTile.vue';
-import { isUserBlocked } from '../utils/userRelationshipsStorageUtils';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _ = defineProps<{ post: Post }>();
 </script>
 <template>
-  <article class="user-post">
+  <article>
     <div class="user-post-data">
       <header class="user-post-header">
-        <h3>{{ post.title }}</h3>
-        <UserActionsTile :username="post.username"></UserActionsTile>
+        <span class="user-post-username">{{ post.username }}</span>
+        <span>-</span><span>{{ $formattedDate(post.createdAt) }}</span>
       </header>
       <p class="user-post-content">{{ post.content }}</p>
-      <div class="user-post-created-at">{{ $formattedDate(post.createdAt) }}</div>
       <div>
         <ol class="post-links-list">
           <h4>Links:</h4>
@@ -29,40 +25,30 @@ const _ = defineProps<{ post: Post }>();
         </ol>
       </div>
     </div>
-    <UserCommentListComponent
-      :comment-list="
-        post.comments.filter((comment) => !isUserBlocked(comment.username))
-      "
-      :parent-id="post.postId"
-    ></UserCommentListComponent>
   </article>
 </template>
 <style lang="scss" scoped>
-.user-post {
-  border-bottom: 0.125rem solid black;
-  border-top: 0.125rem solid black;
-  width: 30rem;
-  padding: 1rem;
-}
-
-.user-post-data {
-  padding-bottom: 0.5rem;
-  border-bottom: 0.0625rem solid black;
-}
-
 .user-post-created-at {
   padding-top: 2rem;
   font-size: 0.875rem;
 }
 
 .user-post-content {
-  padding: 0 1rem;
+  padding: 0;
 }
 
 .user-post-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
+  display: flex;
+  gap: 0.5rem;
+
+  .user-post-username {
+    font-weight: 700;
+  }
+
+  h3 {
+    margin: 0;
+  }
 }
 
 .post-links-list {

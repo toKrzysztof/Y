@@ -1,6 +1,5 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
-const { verifyToken } = require('../../utils/verifyToken');
 const authRoutes = express.Router();
 const { genHash, cmpHash } = require('../../config/hash-config');
 const {
