@@ -8,7 +8,6 @@ import UserCardComponent from './UserCardComponent.vue';
 const mutedUsersList = ref<User[]>((await axios.get(`${API_URL}/user/mute`)).data);
 
 const unmuteUser = (username: string) => {
-  console.log(mutedUsersList.value);
   const filteredUsers = mutedUsersList.value.filter(
     (user) => user.username !== username
   );

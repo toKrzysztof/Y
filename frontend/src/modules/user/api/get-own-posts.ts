@@ -6,7 +6,6 @@ export const getOwnPosts = async (
   skip: number
 ) => {
   const response = await axios.get(`${baseFetchUrl}?skip=${skip}&limit=${limit}`);
-  console.log(response.data);
 
   return response.data;
 };

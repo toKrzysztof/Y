@@ -6,6 +6,5 @@ export const getCommentThreadReplies = async (
   skip: number
 ) => {
   const response = await axios.get(`${baseUrl}?skip=${skip}&limit=${limit}`);
-  console.log(response.data.content, response.data, response.data.content);
   return response.data;
 };
