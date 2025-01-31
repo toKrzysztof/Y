@@ -41,7 +41,7 @@ const _ = defineProps<{ post: Post }>();
 .user-post {
   border-bottom: 0.125rem solid black;
   border-top: 0.125rem solid black;
-  min-width: 20rem;
+  width: 30rem;
   padding: 1rem;
 }
 

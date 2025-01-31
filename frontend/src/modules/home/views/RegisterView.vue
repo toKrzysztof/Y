@@ -14,7 +14,7 @@ const submit = ({ firstName, lastName, username, password }: RegisterFormData) =
   axios
     .post(`${API_URL}/auth/register`, { firstName, lastName, username, password })
     .then(() => {
-      router.push('/login');
+      router.push('/home/login');
     })
     .catch((e) => {
       console.log(`e: ${e}`);

@@ -4,6 +4,7 @@ import InfiniteScrollPageComponent from '../components/InfiniteScrollPageCompone
 import UserPostListComponent from '../components/UserPostListComponent.vue';
 import { API_URL } from '@/config/env';
 import type { Post } from '../models/post-model';
+import { isUserBlocked } from '../utils/userRelationshipsStorageUtils';
 </script>
 
 <template>
@@ -14,7 +15,9 @@ import type { Post } from '../models/post-model';
     :base-fetch-url="`${API_URL}/user/post`"
   >
     <template #itemList="{ itemList }">
-      <UserPostListComponent :post-list="(itemList as Post[])" />
+      <UserPostListComponent
+        :post-list="(itemList as Post[]).filter(post => !isUserBlocked(post.username))"
+      />
     </template>
   </InfiniteScrollPageComponent>
 </template>
