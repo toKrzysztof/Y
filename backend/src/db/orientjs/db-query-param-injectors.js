@@ -1,15 +1,18 @@
 const validRidRegExp = new RegExp('^#\\d+:\\d+$');
 
-const injectRid = (query, paramName, rid) => {
+const injectRids = (query, params) => {
   try {
-    if (validRidRegExp.test(rid) === true) {
-      return query.replace(`:${paramName}`, rid);
-    } else {
-      throw new Error('INVALID RID PROVIDED FOR INJECTION:', rid);
-    }
+    Object.entries(params).forEach(([paramName, rid]) => {
+      if (validRidRegExp.test(rid) === true) {
+        query = query.replace(`:${paramName}`, rid);
+      } else {
+        throw new Error(`INVALID RID PROVIDED FOR INJECTION: ${rid}`);
+      }
+    });
+    return query;
   } catch (err) {
-    console.error('ERROR WHILE INJECTING RID: ', rid, '\nINJECT RID ERROR:', err);
+    console.error('ERROR WHILE INJECTING RIDs:', params, '\nINJECT RID ERROR:', err);
   }
 };
 
-module.exports = { injectRid };
+module.exports = { injectRids };

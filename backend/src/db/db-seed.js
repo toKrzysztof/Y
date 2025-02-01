@@ -9,13 +9,11 @@ const seedDb = async (session) => {
     return Promise.all([
       createDbClassVertex(session, 'User'),
       createDbClassVertex(session, 'Post'),
-      createDbClassVertex(session, 'Comment'),
-      createDbClassEdge(session, 'HasComment'),
+      createDbClassEdge(session, 'HasReply'),
       createDbClassEdge(session, 'Follows'),
       createDbClassEdge(session, 'Mutes'),
       createDbClassEdge(session, 'Blocks'),
       createDbClassEdge(session, 'HasPost'),
-      createDbClassEdge(session, 'MadeComment'),
       populateClasses(session)
     ]);
   } catch (err) {
@@ -52,57 +50,57 @@ const populateClasses = (session) => {
         const [alicePost, bobPost] = await Promise.all([
           createPost(
             session,
-            'My First Post',
             'Hello everyone! This is my first post here.',
-            [],
+            ['https://cataas.com/cat'],
             alice['@rid'],
             alice.username
           ),
           createPost(
             session,
-            'Great Weather Today',
             'Perfect day for a picnic in the park!',
-            [],
+            ['https://cataas.com/cat'],
             bob['@rid'],
             alice.username
           )
         ]);
 
         // Create initial comments (in parallel)
-        const [bobComment, charlieComment] = await Promise.all([
-          createComment(
+        const [bobReply, charlieReply] = await Promise.all([
+          createPost(
             session,
             'Welcome Alice! Great to see you here!',
+            ['https://cataas.com/cat'],
             bob['@rid'],
-            alicePost['@rid'],
-            bob.username
+            bob.username,
+            alicePost['@rid']
           ),
-          createComment(
+          createPost(
             session,
             'Thanks for sharing!',
+            ['https://cataas.com/cat'],
             charlie['@rid'],
-            alicePost['@rid'],
-            charlie.username
+            charlie.username,
+            alicePost['@rid']
           )
         ]);
 
         // Create nested comments and Dave's comment (in parallel)
-        await Promise.all([
-          createComment(
-            session,
-            'Thanks Charlie!',
-            alice['@rid'],
-            charlieComment['@rid'],
-            alice.username
-          ),
-          createComment(
-            session,
-            'Count me in for the picnic!',
-            dave['@rid'],
-            bobPost['@rid'],
-            dave.username
-          )
-        ]);
+        // await Promise.all([
+        //   createComment(
+        //     session,
+        //     'Thanks Charlie!',
+        //     alice['@rid'],
+        //     charlieComment['@rid'],
+        //     alice.username
+        //   ),
+        //   createComment(
+        //     session,
+        //     'Count me in for the picnic!',
+        //     dave['@rid'],
+        //     bobPost['@rid'],
+        //     dave.username
+        //   )
+        // ]);
       }
 
       console.log('Database seeded successfully!');

@@ -3,7 +3,7 @@ const { acquireDbSession, closeDbSession } = require('../../../db/db-tools');
 const {
   getPostsMadeByUser,
   getPostsOfFollowedUsers,
-  getRandomPostsWithFirstLevelComments,
+  getRandomPostsWithFirstLevelReplies,
   createPost,
   deletePost
 } = require('../../../db/queries/post-queries');
@@ -31,7 +31,7 @@ userPostRoutes.get('/post', async (req, res) => {
     const { userId } = req.user;
     const limit = 10;
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await getRandomPostsWithFirstLevelComments(session, userId, limit);
+    const data = await getRandomPostsWithFirstLevelReplies(session, userId, limit);
     closeDbSession(session);
 
     res.status(200).send(data);

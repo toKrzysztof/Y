@@ -1,4 +1,4 @@
-const { injectRid } = require('../orientjs/db-query-param-injectors');
+const { injectRids } = require('../orientjs/db-query-param-injectors');
 
 const findUser = async (session, username) => {
   return await session
@@ -87,10 +87,9 @@ const followUser = async (session, userId, followedUsername) => {
     .one();
 
   if (!existingEdge) {
-    const query = injectRid(
+    const query = injectRids(
       `CREATE EDGE Follows FROM :userId TO (SELECT FROM User WHERE username = :followedUsername)`,
-      'userId',
-      userId
+      { userId }
     );
 
     return await session.command(query, { params: { followedUsername } }).one();
@@ -123,10 +122,9 @@ const muteUser = async (session, userId, mutedUsername) => {
     .one();
 
   if (!existingEdge) {
-    const query = injectRid(
+    const query = injectRids(
       `CREATE EDGE Mutes FROM :userId TO (SELECT FROM User WHERE username = :mutedUsername)`,
-      'userId',
-      userId
+      { userId }
     );
 
     return await session.command(query, { params: { mutedUsername } }).one();
@@ -171,10 +169,9 @@ const blockUser = async (session, userId, blockedUsername) => {
     .all();
 
   if (!existingEdge) {
-    const query = injectRid(
+    const query = injectRids(
       `CREATE EDGE Blocks FROM :userId TO (SELECT FROM User WHERE username = :blockedUsername)`,
-      'userId',
-      userId
+      { userId }
     );
 
     return await session.command(query, { params: { blockedUsername } }).one();
