@@ -15,14 +15,14 @@ const jwtSecret = process.env.JWT_SECRET;
 
 authRoutes.post('/auth/register', async (req, res) => {
   try {
-    const { username, password, firstName, lastName } = req.body;
+    const { username, password, name, lastName } = req.body;
 
     const hashedPassword = genHash(password);
 
     const session = await acquireDbSession(await dbSessionPool);
     const createResponse = createUser(
       session,
-      firstName,
+      name,
       lastName,
       username,
       hashedPassword

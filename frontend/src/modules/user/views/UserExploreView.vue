@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getRandomPosts } from '../api/get-random-posts';
+import { getPosts } from '../api/get-posts';
 import InfiniteScrollPageComponent from '../components/InfiniteScrollPageComponent.vue';
 import UserPostListComponent from '../components/UserPostListComponent.vue';
 import { API_URL } from '@/config/env';
@@ -10,7 +10,7 @@ import UserPostFormComponent from '../components/UserPostFormComponent.vue';
 
 <template>
   <InfiniteScrollPageComponent
-    :fetchData="getRandomPosts"
+    :fetchData="getPosts"
     :postsPerPage="10"
     :no-items-message="'No posts yet...'"
     :base-fetch-url="`${API_URL}/user/post`"

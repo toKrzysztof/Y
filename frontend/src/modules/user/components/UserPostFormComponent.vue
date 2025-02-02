@@ -1,15 +1,11 @@
 <script setup lang="ts">
 import { useContent } from '../composables/useContent';
-import { useLinks } from '../composables/useLinks';
 import { useFormSubmission } from '../composables/useFormSubmission';
 
 const maxChars = 280;
-const maxLinks = 3;
 
-// Use composables
 const { content, charsLeft } = useContent(maxChars);
-const { links, newLink, linkError, addLink, removeLink } = useLinks(maxLinks);
-const { isSubmitting, submit } = useFormSubmission(content.value, links.value);
+const { isSubmitting, submit } = useFormSubmission(content);
 </script>
 
 <template>
@@ -30,7 +26,7 @@ const { isSubmitting, submit } = useFormSubmission(content.value, links.value);
         </span>
       </div>
 
-      <div class="flex">
+      <!-- <div class="flex">
         <input
           type="text"
           v-model="newLink"
@@ -64,7 +60,7 @@ const { isSubmitting, submit } = useFormSubmission(content.value, links.value);
             x
           </button>
         </li>
-      </ul>
+      </ul> -->
 
       <div class="button-box">
         <button type="submit" :disabled="isSubmitting || !content.trim()">
@@ -78,6 +74,7 @@ const { isSubmitting, submit } = useFormSubmission(content.value, links.value);
 <style lang="scss" scoped>
 .post-form-panel {
   border-inline: 0.0625rem solid black;
+  border-bottom: 0.0625rem solid black;
   box-sizing: border-box;
   max-width: 38rem;
   padding: 1rem;

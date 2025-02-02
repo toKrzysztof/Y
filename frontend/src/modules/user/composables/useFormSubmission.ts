@@ -1,9 +1,9 @@
-import { ref } from 'vue';
+import { ref, type Ref } from 'vue';
 import axios from 'axios';
 import { API_URL } from '@/config/env';
 import router from '@/router';
 
-export const useFormSubmission = (content: string, links: string[]) => {
+export const useFormSubmission = (content: Ref<string, string>) => {
   const isSubmitting = ref<boolean>(false);
 
   const submit = async (event: Event) => {
@@ -14,8 +14,7 @@ export const useFormSubmission = (content: string, links: string[]) => {
 
     try {
       await axios.post(`${API_URL}/user/post`, {
-        content,
-        links
+        content: content.value
       });
       router.push('/user/profile');
     } catch (error) {

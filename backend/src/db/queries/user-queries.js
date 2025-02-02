@@ -16,7 +16,7 @@ const findFollowedUsers = async (session, userId) => {
   return await session
     .query(
       `
-SELECT @rid as id, username, firstName, lastName FROM (SELECT expand(out('Follows')) FROM User WHERE @rid = :userId)
+SELECT @rid as id, username, name FROM (SELECT expand(out('Follows')) FROM User WHERE @rid = :userId)
   `,
       { params: { userId } }
     )
@@ -27,7 +27,7 @@ const findBlockedUsers = async (session, userId) => {
   return await session
     .query(
       `
-SELECT @rid as id, username, firstName, lastName FROM (SELECT expand(out('Blocks')) FROM User WHERE @rid = :userId)
+SELECT @rid as id, username, name FROM (SELECT expand(out('Blocks')) FROM User WHERE @rid = :userId)
   `,
       { params: { userId } }
     )
@@ -38,13 +38,13 @@ const findMutedUsers = async (session, userId) => {
   return await session
     .query(
       `
-SELECT @rid as id, username, firstName, lastName FROM (SELECT expand(out('Mutes')) FROM User WHERE @rid = :userId)
+SELECT @rid as id, username, name FROM (SELECT expand(out('Mutes')) FROM User WHERE @rid = :userId)
   `,
       { params: { userId } }
     )
     .all();
 };
-const createUser = async (session, firstName, lastName, username, password) => {
+const createUser = async (session, name, username, password) => {
   const existingUser = await session
     .query(`SELECT FROM User WHERE username = :username`, { params: { username } })
     .one();
@@ -53,8 +53,7 @@ const createUser = async (session, firstName, lastName, username, password) => {
     return await session
       .command(
         `INSERT INTO User SET 
-          firstName = :firstName, 
-          lastName = :lastName, 
+          name = :name, 
           username = :username, 
           password = :password,
           createdAt = :now, 
@@ -62,8 +61,7 @@ const createUser = async (session, firstName, lastName, username, password) => {
         `,
         {
           params: {
-            firstName,
-            lastName,
+            name,
             username,
             password,
             now: new Date()

@@ -26,10 +26,10 @@ const populateClasses = (session) => {
     try {
       // Create users
       const [alice, bob, charlie, dave] = await Promise.all([
-        createUser(session, 'Alice', 'Smith', 'alice123', genHash('password123')),
-        createUser(session, 'Bob', 'Johnson', 'bob456', genHash('password456')),
-        createUser(session, 'Charlie', 'Brown', 'charlie789', genHash('password789')),
-        createUser(session, 'Dave', 'Wilson', 'dave101', genHash('password101')),
+        createUser(session, 'Alice Smith', 'alice123', genHash('password123')),
+        createUser(session, 'Bob', 'bob456', genHash('password456')),
+        createUser(session, 'Charlie Brown', 'charlie789', genHash('password789')),
+        createUser(session, 'Dave Wilson', 'dave101', genHash('password101')),
         createUser(session, 'Jan', 'Admin', 'j.admin', genHash('qwe#@!')),
         createUser(session, 'Jan', 'User', 'j.user', genHash('qwe#@!'))
       ]);
@@ -52,15 +52,13 @@ const populateClasses = (session) => {
             session,
             'Hello everyone! This is my first post here.',
             ['https://cataas.com/cat'],
-            alice['@rid'],
-            alice.username
+            alice['@rid']
           ),
           createPost(
             session,
             'Perfect day for a picnic in the park!',
             ['https://cataas.com/cat'],
-            bob['@rid'],
-            alice.username
+            bob['@rid']
           )
         ]);
 
@@ -71,7 +69,6 @@ const populateClasses = (session) => {
             'Welcome Alice! Great to see you here!',
             ['https://cataas.com/cat'],
             bob['@rid'],
-            bob.username,
             alicePost['@rid']
           ),
           createPost(
@@ -79,7 +76,6 @@ const populateClasses = (session) => {
             'Thanks for sharing!',
             ['https://cataas.com/cat'],
             charlie['@rid'],
-            charlie.username,
             alicePost['@rid']
           )
         ]);

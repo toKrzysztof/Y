@@ -1,10 +1,10 @@
 const { injectRids } = require('../orientjs/db-query-param-injectors');
 
-const createPost = async (session, content, links, userId, parentId = null) => {
+const createPost = async (session, content, userId, parentId = null) => {
   const post = await session
     .command(
-      'CREATE VERTEX Post SET username = :username, content = :content, createdAt = :now, updatedAt = :now, links = :links',
-      { params: { content, now: new Date(), links, username } }
+      'CREATE VERTEX Post SET content = :content, createdAt = :now, updatedAt = :now',
+      { params: { content, now: new Date() } }
     )
     .one();
 
@@ -67,26 +67,16 @@ const getPostsMadeByUser = async (session, userId, skip, limit) => {
 
   const content = await session
     .query(
-      `SELECT username, firstName, lastName, postId, content, createdAt, updatedAt, links, if(eval("comments[0].id IS NULL"), [], comments) as comments
-      FROM (MATCH {Class: User, as: user, where: (@rid = :userId)}-HasPost->{Class: Post, as: post}-HasComment->{Class: Comment, as: comment, optional: true}
+      `MATCH {Class: User, as: user, where: (@rid = :userId)}-HasPost->{Class: Post, as: post}-HasReply->{Class: Post, as: reply, optional: true}
       RETURN
       user.username as username,
-      user.firstName as firstName,
-      user.lastName as lastName,
+      user.name as name,
       post.@rid as postId,
       post.content as content,
       post.createdAt as createdAt,
       post.updatedAt as updatedAt,
-      post.links as links,
-      set({
-                "id": comment.@rid,
-                "createdAt": comment.createdAt,
-                "content": comment.content,
-                "updatedAt": comment.updatedAt,
-                "username": comment.username
-            }) AS comments
-        GROUP BY postId
-) GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
+      post.links as links
+      GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
       { params: { userId, skip: parseInt(skip), limit: parseInt(limit) } }
     )
     .all();
@@ -133,29 +123,49 @@ const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
   //       .one()) || { count: 0, content: [] }
   //   );
 
+  // const content = await session
+  //   .query(
+  //     `SELECT username, firstName, lastName, postId, content, createdAt, updatedAt, links, if(eval("replies[0].id IS NULL"), [], replies) as replies
+  //       FROM (MATCH {Class: User, as: user, where: (@rid = :userId)}-Follows->{Class: User, as: follow}-HasPost->{Class: Post, as: post}-HasReply->{Class: Post, as: reply, optional: true}
+  //       RETURN
+  //       follow.username as username,
+  //       follow.firstName as firstName,
+  //       follow.lastName as lastName,
+  //       post.@rid as postId,
+  //       post.content as content,
+  //       post.createdAt as createdAt,
+  //       post.updatedAt as updatedAt,
+  //       post.links AS links,
+  //       set({
+  //                 "id": reply.@rid,
+  //                 "createdAt": reply.createdAt,
+  //                 "content": reply.content,
+  //                 "updatedAt": reply.updatedAt,
+  //                 "username": reply.username
+  //             }) AS replies
+  //         GROUP BY postId
+  // ) GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
+  //     { params: { userId, skip: parseInt(skip), limit: parseInt(limit) } }
+  //   )
+  //   .all();
+
   const content = await session
     .query(
-      `SELECT username, firstName, lastName, postId, content, createdAt, updatedAt, links, if(eval("replies[0].id IS NULL"), [], replies) as replies
-        FROM (MATCH {Class: User, as: user, where: (@rid = :userId)}-Follows->{Class: User, as: follow}-HasPost->{Class: Post, as: post}-HasReply->{Class: Post, as: reply, optional: true}
+      injectRids(
+        `MATCH {Class: User, as: user, where: (@rid = :userId)}-Follows->{Class: User, as: follow}-HasPost->{Class: Post, as: post}<-HasReply-{Class: Post, as: parentPost, optional: true}<-HasPost-{Class: User, as: parentPostAuthor, optional: true}
         RETURN
-        follow.username as username,
-        follow.firstName as firstName,
-        follow.lastName as lastName,
+        follow.username as authorUsername,
+        follow.name as authorName,
         post.@rid as postId,
         post.content as content,
         post.createdAt as createdAt,
         post.updatedAt as updatedAt,
         post.links AS links,
-        set({
-                  "id": reply.@rid,
-                  "createdAt": reply.createdAt,
-                  "content": reply.content,
-                  "updatedAt": reply.updatedAt,
-                  "username": reply.username
-              }) AS replies
-          GROUP BY postId
-  ) GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
-      { params: { userId, skip: parseInt(skip), limit: parseInt(limit) } }
+        parentPost.@rid as parentPostId, parentPostAuthor.username as parentPostAuthorUsername
+        GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
+        { userId }
+      ),
+      { params: { skip: parseInt(skip), limit: parseInt(limit) } }
     )
     .all();
 
@@ -163,15 +173,37 @@ const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
 };
 
 // Get Post with Comments 1 level deep
-const getNewestPosts = async (session, userId, skip, limit) => {
-  const totalRecords = await session;
+const getNewestPosts = async (session, skip, limit) => {
+  // blocked users' posts filtered
+  // const totalRecords = await session.query(
+  //   "SELECT FROM POST WHERE first(in(HasPost).@rid) NOT IN (SELECT out('Blocks') FROM #userId"
+  // );
+
+  console.log();
+
+  const totalRecords = await session
+    .query('SELECT COUNT(*) as totalRecords FROM POST')
+    .one();
+
+  // blocked users' posts filtered
+  //   const posts = await session
+  //     .query(
+  //       `SELECT FROM (MATCH {Class: User, as: user}-HasPost->{Class: Post, as: post}<-HasReply-{Class: Post, as: parentPost, optional: true}<-HasPost-{Class: User, as: parentPostAuthor, optional: true}
+  // RETURN post.content as content, post.createdAt as createdAt, post.links as links, user.username as authorUsername, user.@rid as authorId, parentPostAuthor.username as parentPostAuthorUsername)
+  // WHERE authorId NOT IN (select out('Blocks') FROM #83:0)`,
+  //       { params: { skip, limit } }
+  //     )
+  //     .all();
 
   const posts = await session
     .query(
-      `SELECT createdAt, links, content, username, in('HasReply').username as inReplyTo FROM Post  GROUP BY content ORDER BY createdAt ASC SKIP :skip LIMIT :limit`,
-      { params: { skip, limit } }
+      `MATCH {Class: User, as: user}-HasPost->{Class: Post, as: post}<-HasReply-{Class: Post, as: parentPost, optional: true}<-HasPost-{Class: User, as: parentPostAuthor, optional: true}
+RETURN post.@rid as id, post.content as content, post.createdAt as createdAt, post.links as links, user.username as authorUsername, user.name as authorName, parentPost.@rid as parentPostId, parentPostAuthor.username as parentPostAuthorUsername GROUP BY id ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
+      { params: { skip: parseInt(skip), limit: parseInt(limit) } }
     )
     .all();
+
+  return { count: totalRecords.totalRecords, content: posts };
 };
 
 const getNewestPostsWithFirstLevelReplies = async (session, userId, skip, limit) => {
@@ -197,8 +229,7 @@ const getNewestPostsWithFirstLevelReplies = async (session, userId, skip, limit)
             post.updatedAt AS updatedAt,
             post.links AS links,
             author.username as username,
-            author.firstName as firstName,
-            author.lastName as lastName,
+            author.name as name,
             set({
                 "id": comment.@rid,
                 "createdAt": comment.createdAt,
@@ -227,5 +258,5 @@ module.exports = {
   deletePost,
   getPostsMadeByUser,
   getPostsOfFollowedUsers,
-  getRandomPostsWithFirstLevelReplies
+  getNewestPosts
 };

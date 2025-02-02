@@ -1,33 +1,87 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { Post } from '@/modules/user/models/post-model';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _ = defineProps<{ post: Post }>();
+
+const props = defineProps<{ post: Post }>();
+
+const urlRegex =
+  /(?<!\S)(https?:\/\/)?(?!-)[A-Za-z0-9-]{1,63}(?<!-)\.(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63}(?<!-))*(?!\S)/g;
+
+const contentParts = computed(() => {
+  const parts = [];
+  let lastIndex = 0;
+
+  const matches = Array.from(props.post.content.matchAll(urlRegex));
+
+  for (const match of matches) {
+    console.log('MATCHES', matches);
+    const matchStart = match.index;
+    const matchEnd = matchStart + match[0].length;
+
+    const isFullMatch =
+      (matchStart === 0 || !/\S/.test(props.post.content[matchStart - 1])) &&
+      (matchEnd === props.post.content.length ||
+        !/\S/.test(props.post.content[matchEnd]));
+    if (isFullMatch) {
+      if (matchStart > lastIndex) {
+        parts.push({
+          type: 'text',
+          value: props.post.content.slice(lastIndex, matchStart)
+        });
+      }
+
+      parts.push({ type: 'link', value: match[0] });
+
+      lastIndex = matchEnd;
+    }
+  }
+
+  if (lastIndex < props.post.content.length) {
+    parts.push({
+      type: 'text',
+      value: props.post.content.slice(lastIndex)
+    });
+  }
+
+  return parts;
+});
 </script>
+
 <template>
   <article>
     <div class="user-post-data">
       <header class="user-post-header">
-        <span class="user-post-username">{{ post.username }}</span>
-        <span>-</span><span>{{ $formattedDate(post.createdAt) }}</span>
+        <div class="user-post-primary-data font-grey">
+          <span class="user-post-name">{{ post.authorName }}</span>
+          <span class="user-post-username">@{{ post.authorUsername }}</span>
+          <span>-</span>
+          <span>{{ $formattedDate(post.createdAt) }}</span>
+        </div>
+        <div v-if="post.parentPostId !== null" class="user-post-reply-info font-grey">
+          Replying to @{{ post.parentPostAuthorUsername }}
+        </div>
       </header>
-      <p class="user-post-content">{{ post.content }}</p>
-      <div>
-        <ol class="post-links-list">
-          <h4>Links:</h4>
-          <span v-show="post.links.length === 0" class="no-links-message"
-            >No links attached...</span
-          >
-          <div v-if="post.links.length > 0">
-            <li v-for="(link, index) in post.links" v-bind:key="index">
-              <a :href="link" class="link-normal">{{ link }}</a>
-            </li>
-          </div>
-        </ol>
-      </div>
+      <p class="user-post-content">
+        <template v-for="(part, index) in contentParts" :key="index">
+          <template v-if="part.type === 'text'">
+            {{ part.value }}
+          </template>
+          <a v-else :href="part.value" target="_blank" rel="noopener noreferrer">
+            {{ part.value }}
+          </a>
+        </template>
+      </p>
     </div>
   </article>
 </template>
+
 <style lang="scss" scoped>
+.user-post-primary-data {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
 .user-post-created-at {
   padding-top: 2rem;
   font-size: 0.875rem;
@@ -35,14 +89,26 @@ const _ = defineProps<{ post: Post }>();
 
 .user-post-content {
   padding: 0;
+  margin: 0;
+  padding-top: 0.3125rem;
+
+  a {
+    color: #1da1f2; /* Twitter-like link color */
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.user-post-reply-info {
+  padding-top: 0.3125rem;
 }
 
 .user-post-header {
-  align-items: center;
-  display: flex;
-  gap: 0.5rem;
-
-  .user-post-username {
+  .user-post-name {
+    color: black;
     font-weight: 700;
   }
 

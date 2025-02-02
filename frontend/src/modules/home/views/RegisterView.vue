@@ -4,15 +4,14 @@ import router from '@/router';
 import axios from 'axios';
 
 interface RegisterFormData {
-  firstName: string;
-  lastName: string;
+  name: string;
   username: string;
   password: string;
 }
 
-const submit = ({ firstName, lastName, username, password }: RegisterFormData) => {
+const submit = ({ name, username, password }: RegisterFormData) => {
   axios
-    .post(`${API_URL}/auth/register`, { firstName, lastName, username, password })
+    .post(`${API_URL}/auth/register`, { name, username, password })
     .then(() => {
       router.push('/home/login');
     })

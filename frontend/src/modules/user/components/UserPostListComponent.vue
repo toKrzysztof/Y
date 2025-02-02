@@ -20,6 +20,10 @@ const _ = defineProps<{ postList: Post[] }>();
   padding: 1rem;
   width: 100%;
 
+  &:first-child {
+    border-top: 0;
+  }
+
   &:last-child {
     border-bottom: 0.0625rem solid black;
   }
