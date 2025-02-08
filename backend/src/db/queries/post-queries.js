@@ -69,8 +69,8 @@ const getPostsMadeByUser = async (session, userId, skip, limit) => {
     .query(
       `MATCH {Class: User, as: user, where: (@rid = :userId)}-HasPost->{Class: Post, as: post}-HasReply->{Class: Post, as: reply, optional: true}
       RETURN
-      user.username as username,
-      user.name as name,
+      user.username as authorUsername,
+      user.name as authorName,
       post.@rid as postId,
       post.content as content,
       post.createdAt as createdAt,
