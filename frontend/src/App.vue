@@ -12,6 +12,8 @@ import { RouterView } from 'vue-router';
 // @import '@/assets/scss/global.scss';
 
 .wrapper {
+  background-color: black;
+  color: white;
   height: 100vh;
   align-items: center;
   display: flex;

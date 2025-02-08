@@ -1,10 +1,10 @@
 const { injectRids } = require('../orientjs/db-query-param-injectors');
 
-const createPost = async (session, content, userId, parentId = null) => {
+const createPost = async (session, content, links, userId, parentId = null) => {
   const post = await session
     .command(
-      'CREATE VERTEX Post SET content = :content, createdAt = :now, updatedAt = :now',
-      { params: { content, now: new Date() } }
+      'CREATE VERTEX Post SET content = :content, links = :links, createdAt = :now, updatedAt = :now',
+      { params: { content, links, now: new Date() } }
     )
     .one();
 
@@ -172,7 +172,6 @@ const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
   return { count: totalRecords.totalRecords, content: content };
 };
 
-// Get Post with Comments 1 level deep
 const getNewestPosts = async (session, skip, limit) => {
   // blocked users' posts filtered
   // const totalRecords = await session.query(

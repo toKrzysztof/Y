@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import HomeHeaderNavbar from './HomeHeaderNavbar.vue';
+// import HomeHeaderNavbar from './HomeHeaderNavbar.vue';
 </script>
 <template>
-  <HomeHeaderNavbar></HomeHeaderNavbar>
+  <!-- <HomeHeaderNavbar></HomeHeaderNavbar> -->
   <RouterView></RouterView>
 </template>

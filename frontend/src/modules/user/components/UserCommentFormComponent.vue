@@ -46,7 +46,7 @@ const submit = (content: { content: string }) => {
   max-width: 20rem;
   padding-bottom: 1rem;
 
-  ::v-deep {
+  :deep {
     .formkit-form {
       align-items: flex-end;
       display: flex;

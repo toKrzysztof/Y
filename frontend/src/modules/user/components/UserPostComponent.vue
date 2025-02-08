@@ -14,7 +14,6 @@ const contentParts = computed(() => {
   const matches = Array.from(props.post.content.matchAll(urlRegex));
 
   for (const match of matches) {
-    console.log('MATCHES', matches);
     const matchStart = match.index;
     const matchEnd = matchStart + match[0].length;
 
@@ -22,6 +21,7 @@ const contentParts = computed(() => {
       (matchStart === 0 || !/\S/.test(props.post.content[matchStart - 1])) &&
       (matchEnd === props.post.content.length ||
         !/\S/.test(props.post.content[matchEnd]));
+
     if (isFullMatch) {
       if (matchStart > lastIndex) {
         parts.push({
@@ -30,7 +30,12 @@ const contentParts = computed(() => {
         });
       }
 
-      parts.push({ type: 'link', value: match[0] });
+      let url = match[0];
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = `https://${url}`;
+      }
+
+      parts.push({ type: 'link', value: url });
 
       lastIndex = matchEnd;
     }
@@ -93,7 +98,7 @@ const contentParts = computed(() => {
   padding-top: 0.3125rem;
 
   a {
-    color: #1da1f2; /* Twitter-like link color */
+    color: #1da1f2;
     text-decoration: none;
 
     &:hover {

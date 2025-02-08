@@ -1,7 +1,98 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import router from '@/router';
+const login = () => router.push('/home/login');
+const register = () => router.push('/home/register');
+</script>
 
 <template>
-  <main>
-    <h1>Welcome to Y - the best social media platform</h1>
+  <main class="landing-page-wrapper">
+    <div class="landing-page-content">
+      <section class="landing-page-section">
+        <img src="/public/logo.png" alt="y-logo" />
+      </section>
+      <section class="landing-page-header">
+        <h1 class="header">Trending topics from all over the world</h1>
+        <div class="bottom-section">
+          <h2 class="subheader">Join now.</h2>
+          <button class="button-primary landing-page-button" @click="register">
+            Register
+          </button>
+          <div class="separator">
+            <span class="separator-or">or</span>
+          </div>
+          <button class="button-secondary landing-page-button" @click="login">
+            Log in
+          </button>
+        </div>
+      </section>
+    </div>
   </main>
 </template>
+<style lang="scss" scoped>
+.landing-page-wrapper {
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  width: 100%;
+  color: white;
+  margin: auto;
+}
+
+.landing-page-header {
+  max-width: 40rem;
+}
+
+.landing-page-content {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin: auto;
+  max-width: 75rem;
+}
+
+.header {
+  font-size: 4rem;
+  font-weight: 700;
+  margin-top: 0;
+  color: rgb(202, 202, 202);
+}
+
+.subheader {
+  font-size: 2rem;
+}
+
+.bottom-section {
+  max-width: 15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .landing-page-button {
+    width: 100%;
+  }
+}
+
+.separator {
+  align-items: center;
+  display: flex;
+
+  &::before {
+    content: '';
+    height: 0.0625rem;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  &::after {
+    content: '';
+    height: 0.0625rem;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .separator-or {
+    width: fit-content;
+    padding: 0 0.5rem;
+  }
+}
+</style>

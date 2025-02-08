@@ -59,11 +59,11 @@ userPostRoutes.get('/post/follow', async (req, res) => {
 
 userPostRoutes.post('/post', async (req, res) => {
   try {
-    const { content } = req.body;
+    const { content, links } = req.body;
     const { userId } = req.user;
 
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await createPost(session, content, userId);
+    const data = await createPost(session, content, links, userId);
     closeDbSession(session);
 
     res.status(200).send(data);

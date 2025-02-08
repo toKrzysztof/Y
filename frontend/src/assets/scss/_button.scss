@@ -45,6 +45,31 @@
 }
 
 html body button {
-  @extend %button-base;
-  @extend %button-interactions;
+  &.button-primary {
+    @extend %button-base;
+    @extend %button-interactions;
+  }
+
+  &.button-secondary {
+    @extend %button-base;
+    @extend %button-interactions;
+    background-color: black;
+    color: #29adff;
+
+    &:hover {
+      background-color: #009dff31;
+      // color: #ffffff;
+    }
+
+    &:active {
+      background-color: #60c2ff6f;
+      // color: #ffffff;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px #b3dbfa;
+      color: #ffffff;
+    }
+  }
 }

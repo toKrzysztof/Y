@@ -23,4 +23,3 @@ przenieść docker compose w root projektu
 ! walidacja mute, block, follow -> nie można siebie samego
 ! websockety
 ! naprawić .env.local i .env.prod na backendzie
-! docker frontendu i backendu + produkcyjny nginx
