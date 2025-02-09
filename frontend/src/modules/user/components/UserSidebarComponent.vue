@@ -30,11 +30,13 @@ import LogoutButtonComponent from './LogoutButtonComponent.vue';
   </div>
 </template>
 <style lang="scss" scoped>
+@use '@/assets/scss/variables' as *;
+
 .sidebar {
+  align-items: flex-end;
   box-sizing: border-box;
-  max-width: 20rem;
-  background-color: white;
-  border-right: 0.0625rem solid rgb(185, 185, 185);
+  border-right: 0.0625rem solid $border-grey;
+  max-width: calc(50% - 20rem);
   width: 100%;
   display: flex;
   flex-direction: column;

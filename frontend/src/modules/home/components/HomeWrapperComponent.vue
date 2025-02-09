@@ -1,7 +1,4 @@
-<script setup lang="ts">
-// import HomeHeaderNavbar from './HomeHeaderNavbar.vue';
-</script>
+<script setup lang="ts"></script>
 <template>
-  <!-- <HomeHeaderNavbar></HomeHeaderNavbar> -->
-  <RouterView></RouterView>
+  <RouterView :key="$route.fullPath"></RouterView>
 </template>

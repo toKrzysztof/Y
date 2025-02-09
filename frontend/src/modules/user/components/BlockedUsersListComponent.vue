@@ -28,7 +28,10 @@ const unblockUser = (username: string) => {
   <ul class="blocked-users-list" v-if="blockedUsersList.length > 0">
     <li v-for="user in blockedUsersList" v-bind:key="user.id" class="flex">
       <UserCardComponent :user="user"></UserCardComponent
-      ><button class="button-small" @click="() => unblockUser(user.username)">
+      ><button
+        class="button-small button-primary"
+        @click="() => unblockUser(user.username)"
+      >
         Unblock
       </button>
     </li>

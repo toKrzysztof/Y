@@ -41,7 +41,7 @@ const routeBack = () => {
   >
     <template #regular-content>
       <header>
-        <button @click="routeBack" class="button-small">Back</button>
+        <button @click="routeBack" class="button-small button-primary">Back</button>
       </header>
       <UserMainCommentComponent :comment="comment"></UserMainCommentComponent>
     </template>

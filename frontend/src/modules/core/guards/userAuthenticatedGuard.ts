@@ -12,6 +12,6 @@ export const userAuthenticatedGuard = async (to, from, next) => {
   if (isAuthenticated) {
     next();
   } else {
-    next({ name: 'Login' });
+    next({ path: '/' });
   }
 };

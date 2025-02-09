@@ -21,7 +21,7 @@
   width: 100%;
 }
 .font-grey {
-  color: #aaaaaa;
+  color: #767676;
 }
 
 :deep {
@@ -31,5 +31,53 @@
   }
   .formkit-message {
     color: red;
+  }
+}
+
+input:autofill {
+  -webkit-text-fill-color: white !important;
+  box-shadow: 0 0 0 6.25rem black inset;
+  caret-color: white;
+}
+
+input:-webkit-autofill {
+  -webkit-text-fill-color: white !important;
+  box-shadow: 0 0 0 6.25rem black inset;
+  caret-color: white;
+}
+
+input,
+textarea {
+  color: white;
+  background-color: black;
+}
+
+input {
+  height: 2rem;
+  border-radius: 0.25rem;
+  width: 15rem;
+  filter: none;
+  padding: 0.25rem 0.5rem;
+
+  &:hover {
+    border-color: #29adff;
+    outline: 0.0625rem solid #29adff;
+  }
+
+  &:focus {
+    border-color: #60c2ff;
+    outline: 0.0625rem solid #60c2ff;
+  }
+
+  &:active {
+    border-color: #60c2ff;
+    outline: 0.0625rem solid #60c2ff;
+  }
+}
+
+.input-wrapper {
+  label {
+    display: block;
+    padding-bottom: 0.25rem;
   }
 }

@@ -1,33 +1,54 @@
 <script setup lang="ts">
-import router from '@/router';
-const login = () => router.push('/home/login');
-const register = () => router.push('/home/register');
+import { useModal } from '@/modules/shared/composables/useModal';
+import ModalComponent from '@/modules/shared/components/ModalComponent.vue';
+import LoginView from './LoginView.vue';
+import RegisterView from './RegisterView.vue';
+
+const { isModalOpen, modalTitle, modalContent, openModal, closeModal } = useModal();
+
+const openLoginModal = () => {
+  openModal('Login', LoginView); // Pass the title and component
+};
+
+const openRegisterModal = () => {
+  openModal('Register', RegisterView); // Pass the title and component
+};
 </script>
 
 <template>
   <main class="landing-page-wrapper">
     <div class="landing-page-content">
       <section class="landing-page-section">
-        <img src="/public/logo.png" alt="y-logo" />
+        <img src="/logo.png" alt="y-logo" />
       </section>
       <section class="landing-page-header">
         <h1 class="header">Trending topics from all over the world</h1>
         <div class="bottom-section">
           <h2 class="subheader">Join now.</h2>
-          <button class="button-primary landing-page-button" @click="register">
+          <button
+            class="button-secondary landing-page-button"
+            @click="openRegisterModal"
+          >
             Register
           </button>
           <div class="separator">
             <span class="separator-or">or</span>
           </div>
-          <button class="button-secondary landing-page-button" @click="login">
+          <button class="button-primary landing-page-button" @click="openLoginModal">
             Log in
           </button>
         </div>
       </section>
     </div>
   </main>
+  <ModalComponent
+    :isOpen="isModalOpen"
+    :title="modalTitle"
+    :content="modalContent"
+    @close="closeModal"
+  />
 </template>
+
 <style lang="scss" scoped>
 .landing-page-wrapper {
   display: grid;

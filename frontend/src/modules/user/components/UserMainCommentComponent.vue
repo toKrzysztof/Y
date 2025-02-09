@@ -17,6 +17,8 @@ const props = defineProps<{ comment: Comment }>();
   </article>
 </template>
 <style lang="scss" scoped>
+@use '@/assets/scss/variables' as *;
+
 .user-comment-footer {
   display: flex;
   justify-content: space-between;
@@ -29,7 +31,7 @@ const props = defineProps<{ comment: Comment }>();
   padding-top: 2rem;
   min-width: 20rem;
   padding: 1rem;
-  border-bottom: 0.0625rem solid black;
+  border-bottom: 0.0625rem solid $border-grey;
   margin-top: 2rem;
 }
 

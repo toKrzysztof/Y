@@ -11,14 +11,14 @@ const onClick = async () => {
       localStorage.removeItem('username');
       localStorage.removeItem('followedUsers');
       localStorage.removeItem('blockedUsers');
-      router.push('/home/login');
+      router.push('/home');
     })
     .catch(console.log);
 };
 </script>
 <template>
   <div class="button-box">
-    <button v-on:click="onClick">Logout</button>
+    <button v-on:click="onClick" class="button-primary">Logout</button>
   </div>
 </template>
 <style lang="scss" scoped>

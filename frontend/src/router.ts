@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import NotFoundView from '@/modules/core/views/NotFoundView.vue';
+import NotFoundView from './modules/shared/views/NotFoundView.vue';
 import { USER_ROUTES } from '@/modules/user/user-routes';
 import { userAuthenticatedGuard } from '@/modules/core/guards/userAuthenticatedGuard';
 import { HOME_ROUTES } from '@/modules/home/home-routes';
@@ -13,7 +13,6 @@ const router = createRouter({
       path: '/home',
       name: 'Home',
       component: () => import('@/modules/home/components/HomeWrapperComponent.vue'),
-
       children: HOME_ROUTES
     },
     {

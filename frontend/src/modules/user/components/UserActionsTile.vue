@@ -75,28 +75,28 @@ const unblock = (username: string) => {
     <button
       v-if="!userFollowed && username !== ownUsername"
       @click="() => follow(username)"
-      class="button-small"
+      class="button-small button-primary"
     >
       follow
     </button>
     <button
       v-if="userFollowed && username !== ownUsername"
       @click="() => unfollow(username)"
-      class="button-small"
+      class="button-small button-primary"
     >
       unfollow
     </button>
     <button
       v-if="!userBlocked && username !== ownUsername"
       @click="() => block(username)"
-      class="button-small"
+      class="button-small button-primary"
     >
       block
     </button>
     <button
       v-if="userBlocked && username !== ownUsername"
       @click="() => unblock(username)"
-      class="button-small"
+      class="button-small button-primary"
     >
       unblock
     </button>

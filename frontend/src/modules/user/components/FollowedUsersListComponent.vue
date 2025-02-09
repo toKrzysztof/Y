@@ -28,7 +28,10 @@ const unfollowUser = (username: string) => {
   <ul v-if="followedUsersList.length > 0" class="followed-users-list">
     <li v-for="user in followedUsersList" v-bind:key="user.id" class="flex">
       <UserCardComponent :user="user"></UserCardComponent
-      ><button class="button-small" @click="() => unfollowUser(user.username)">
+      ><button
+        class="button-small button-primary"
+        @click="() => unfollowUser(user.username)"
+      >
         Unfollow
       </button>
     </li>

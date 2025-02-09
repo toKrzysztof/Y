@@ -4,15 +4,14 @@ import { RouterView } from 'vue-router';
 
 <template>
   <div class="wrapper">
-    <RouterView />
+    <RouterView :key="$route.fullPath" />
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 // @import '@/assets/scss/global.scss';
 
 .wrapper {
-  background-color: black;
   color: white;
   height: 100vh;
   align-items: center;

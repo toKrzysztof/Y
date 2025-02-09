@@ -63,7 +63,11 @@ const { isSubmitting, submit } = useFormSubmission(content);
       </ul> -->
 
       <div class="button-box">
-        <button type="submit" :disabled="isSubmitting || !content.trim()">
+        <button
+          type="submit"
+          :disabled="isSubmitting || !content.trim()"
+          class="button-secondary"
+        >
           {{ isSubmitting ? 'Posting...' : 'Post' }}
         </button>
       </div>
@@ -72,9 +76,9 @@ const { isSubmitting, submit } = useFormSubmission(content);
 </template>
 
 <style lang="scss" scoped>
+@use '@/assets/scss/variables' as *;
 .post-form-panel {
-  border-inline: 0.0625rem solid black;
-  border-bottom: 0.0625rem solid black;
+  border-right: 0.0625rem solid $border-grey;
   box-sizing: border-box;
   max-width: 38rem;
   padding: 1rem;
@@ -102,7 +106,7 @@ const { isSubmitting, submit } = useFormSubmission(content);
 
     &:focus {
       outline: none;
-      box-shadow: 0 1px 0 0 black;
+      box-shadow: 0 0.0625rem 0 0 $border-grey;
     }
   }
 
@@ -111,11 +115,11 @@ const { isSubmitting, submit } = useFormSubmission(content);
     right: 0;
     bottom: 0;
     font-size: 0.875rem;
-    color: #666;
+    color: #dddddd;
   }
 
   .char-warning {
-    color: #ff0000;
+    color: #ff2d2d;
   }
 
   input {
@@ -144,15 +148,6 @@ const { isSubmitting, submit } = useFormSubmission(content);
       justify-content: space-between;
       align-items: center;
       margin-bottom: 0.5rem;
-    }
-  }
-
-  button {
-    cursor: pointer;
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
     }
   }
 

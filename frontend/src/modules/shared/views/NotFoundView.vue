@@ -6,7 +6,7 @@ const goBack = () => {
 };
 </script>
 <template>
-  <button @click="goBack">Back</button>
+  <button @click="goBack" class="button-primary">Back</button>
   <RouterLink to="/">Home</RouterLink>
   <h1>404 - page not found!</h1>
 </template>

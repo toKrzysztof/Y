@@ -7,8 +7,7 @@ const props = defineProps<{ user: User }>();
   <article class="flex">
     <span>{{ props.user.username }}</span
     >-
-    <span>{{ props.user.firstName }}</span>
-    <span>{{ props.user.lastName }}</span>
+    <span>{{ props.user.name }}</span>
   </article>
 </template>
 <style lang="scss" scoped>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import { API_URL } from '@/config/env';
 import router from '@/router';
 import axios from 'axios';
@@ -8,9 +9,18 @@ interface LoginCredentials {
   password: string;
 }
 
-const submit = ({ username, password }: LoginCredentials) => {
+const form = ref<LoginCredentials>({
+  username: '',
+  password: ''
+});
+
+const isFormValid = computed(() => {
+  return form.value.username.trim() !== '' && form.value.password.trim() !== '';
+});
+
+const submit = (credentials: LoginCredentials) => {
   axios
-    .post(`${API_URL}/auth/login`, { username, password })
+    .post(`${API_URL}/auth/login`, credentials)
     .then((res) => {
       localStorage.removeItem('userId');
       localStorage.removeItem('username');
@@ -30,18 +40,46 @@ const submit = ({ username, password }: LoginCredentials) => {
 
 <template>
   <article class="login-form-panel">
-    <h1>Login</h1>
-    <FormKit type="form" :actions="false" @submit="submit">
-      <FormKit type="text" label="Username" name="username" />
-      <div class="double">
-        <FormKit
-          type="password"
-          name="password"
-          label="Password"
-          validation="required"
+    <form @submit.prevent="submit(form)" class="login-form">
+      <div class="input-wrapper">
+        <label for="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          placeholder="Enter your name"
+          v-model="form.username"
         />
       </div>
-      <FormKit type="submit" />
-    </FormKit>
+      <div class="input-wrapper">
+        <label for="password">Password</label>
+        <input
+          type="password"
+          placeholder="Enter your password"
+          id="password"
+          v-model="form.password"
+        />
+      </div>
+      <button
+        type="submit"
+        class="button-primary login-button"
+        :disabled="!isFormValid"
+      >
+        Continue
+      </button>
+    </form>
   </article>
 </template>
+
+<style lang="scss" scoped>
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  width: 100%;
+
+  .login-button {
+    width: 100%;
+  }
+}
+</style>

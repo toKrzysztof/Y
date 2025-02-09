@@ -58,11 +58,14 @@ const contentParts = computed(() => {
       <header class="user-post-header">
         <div class="user-post-primary-data font-grey">
           <span class="user-post-name">{{ post.authorName }}</span>
-          <span class="user-post-username">@{{ post.authorUsername }}</span>
+          <span class="user-post-username font-grey">@{{ post.authorUsername }}</span>
           <span>-</span>
           <span>{{ $formattedDate(post.createdAt) }}</span>
         </div>
-        <div v-if="post.parentPostId !== null" class="user-post-reply-info font-grey">
+        <div
+          v-if="post.parentPostId !== null && post.parentPostId !== undefined"
+          class="user-post-reply-info font-grey"
+        >
           Replying to @{{ post.parentPostAuthorUsername }}
         </div>
       </header>
@@ -113,7 +116,7 @@ const contentParts = computed(() => {
 
 .user-post-header {
   .user-post-name {
-    color: black;
+    color: white;
     font-weight: 700;
   }
 

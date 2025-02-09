@@ -12,8 +12,11 @@ const _ = defineProps<{ postList: Post[] }>();
   </ol>
 </template>
 <style lang="scss" scoped>
+@use '@/assets/scss/variables' as *;
+
 .user-post {
-  border: 0.0625rem solid black;
+  border-right: 0.0625rem solid $border-grey;
+  border-top: 0.0625rem solid $border-grey;
   border-bottom: 0;
   box-sizing: border-box;
   font-size: 0.9375rem;
@@ -21,11 +24,11 @@ const _ = defineProps<{ postList: Post[] }>();
   width: 100%;
 
   &:first-child {
-    border-top: 0;
+    border-top: 0.0625rem solid $border-grey;
   }
 
   &:last-child {
-    border-bottom: 0.0625rem solid black;
+    border-bottom: 0.0625rem solid $border-grey;
   }
 }
 .post-list {

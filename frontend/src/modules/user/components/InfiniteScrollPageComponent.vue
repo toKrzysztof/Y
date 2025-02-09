@@ -96,7 +96,7 @@ useInfiniteScroll(
 
 <style lang="scss" scoped>
 .scroll-page-content-wrapper {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   flex-direction: column;
   list-style: none;

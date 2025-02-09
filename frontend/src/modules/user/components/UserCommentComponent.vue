@@ -19,7 +19,10 @@ const onClick = (commentId: string) => {
     <div class="user-comment-footer">
       <div class="user-comment-created-at">{{ $formattedDate(comment.createdAt) }}</div>
       <div class="button-box">
-        <button class="button-small" v-on:click="() => onClick(comment.id)">
+        <button
+          class="button-small button-primary"
+          v-on:click="() => onClick(comment.id)"
+        >
           View thread
         </button>
       </div>
