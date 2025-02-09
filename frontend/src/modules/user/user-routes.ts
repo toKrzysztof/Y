@@ -4,26 +4,30 @@ import UserChatView from './views/UserChatView.vue';
 import UserFeedView from './views/UserFeedView.vue';
 import UserProfileView from './views/UserProfileView.vue';
 import UserMetadataFormView from './views/UserMetadataFormView.vue';
-import UserCommentThreadView from './views/UserCommentThreadView.vue';
+import UserPostThreadView from './views/UserPostThreadView.vue';
+import { userAuthenticatedGuard } from '../core/guards/userAuthenticatedGuard';
 
 export const USER_ROUTES: RouteRecordRaw[] = [
   {
     path: 'my-feed',
     name: 'My-feed',
-    component: UserFeedView
+    component: UserFeedView,
+    beforeEnter: userAuthenticatedGuard
   },
   {
     path: 'explore',
     name: 'Explore',
-    component: UserExploreView
+    component: UserExploreView,
+    beforeEnter: userAuthenticatedGuard
   },
   {
     path: 'chat',
     name: 'Chat',
-    component: UserChatView
+    component: UserChatView,
+    beforeEnter: userAuthenticatedGuard
   },
   {
-    path: 'profile',
+    path: ':username',
     name: 'Profile',
     component: UserProfileView,
     children: [
@@ -32,12 +36,14 @@ export const USER_ROUTES: RouteRecordRaw[] = [
         name: 'Settings',
         component: UserMetadataFormView
       }
-    ]
+    ],
+    beforeEnter: userAuthenticatedGuard
   },
   {
-    path: 'comment/:commentId',
-    name: 'Comment-thread',
-    component: UserCommentThreadView,
-    props: true
+    path: 'post/:postId',
+    name: 'Post-thread',
+    component: UserPostThreadView,
+    props: true,
+    beforeEnter: userAuthenticatedGuard
   }
 ];

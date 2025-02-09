@@ -11,17 +11,14 @@
   transition: background-color 0.2s ease-out, transform 0.2s ease-out;
   width: fit-content;
   white-space: nowrap;
+  text-decoration: none;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
 
   &.button-small {
     padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
-  }
-
-  &.button-icon {
-    i {
-      font-size: 1.5rem;
-      padding-right: 0.75rem;
-    }
   }
 }
 
@@ -46,8 +43,14 @@
   }
 }
 
-html body button {
-  &.button-x {
+html body a {
+  display: block;
+}
+
+html body button,
+a {
+  &.button-x,
+  &.link-x {
     background-color: transparent;
     border-radius: 50%;
     border: none;
@@ -69,12 +72,14 @@ html body button {
     }
   }
 
-  &.button-secondary {
+  &.button-secondary,
+  &.link-secondary {
     @extend %button-base;
     @extend %button-interactions;
   }
 
-  &.button-primary {
+  &.button-primary,
+  &.link-primary {
     @extend %button-base;
     @extend %button-interactions;
     background-color: rgba(0, 0, 0, 0);

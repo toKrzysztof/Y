@@ -7,7 +7,7 @@ const _ = defineProps<{ postList: Post[] }>();
 <template>
   <ol ref="listElement" class="post-list">
     <li v-for="post in postList" v-bind:key="post.postId" class="user-post">
-      <UserPostComponent :post="post"></UserPostComponent>
+      <UserPostComponent :post="post" :threadView="false"></UserPostComponent>
     </li>
   </ol>
 </template>
@@ -15,7 +15,6 @@ const _ = defineProps<{ postList: Post[] }>();
 @use '@/assets/scss/variables' as *;
 
 .user-post {
-  border-right: 0.0625rem solid $border-grey;
   border-top: 0.0625rem solid $border-grey;
   border-bottom: 0;
   box-sizing: border-box;

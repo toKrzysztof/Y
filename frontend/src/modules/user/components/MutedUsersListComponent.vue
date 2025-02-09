@@ -14,9 +14,7 @@ const unmuteUser = (username: string) => {
   mutedUsersList.value = filteredUsers;
   axios
     .delete(`${API_URL}/user/mute/${username}`)
-    .then((res) => {
-      console.log(res);
-    })
+    .then((res) => {})
     .catch((e) => console.log(e));
 };
 </script>

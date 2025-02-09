@@ -20,6 +20,9 @@ const form = ref<RegisterFormData>({
 
 const errors = ref<Partial<Record<keyof RegisterFormData, string>>>({});
 
+const specialCharacterRegex = /[!@#$%^&*()\-_=+{}\[\]|;:'",.<>/?`~]/g;
+const atLeastOneCapitalLetterRegex = /[A-Z]/g;
+
 const validateField = (field: keyof RegisterFormData) => {
   switch (field) {
     case 'name':
@@ -43,8 +46,12 @@ const validateField = (field: keyof RegisterFormData) => {
     case 'password':
       if (!form.value.password.trim()) {
         errors.value.password = 'Password is required.';
-      } else if (form.value.password.length < 6) {
-        errors.value.password = 'Password must be at least 6 characters.';
+      } else if (form.value.password.length < 8) {
+        errors.value.password = 'Password must be at least 8 characters.';
+      } else if (!form.value.password.match(specialCharacterRegex)) {
+        errors.value.password = 'Password must include at least one special character';
+      } else if (!form.value.password.match(atLeastOneCapitalLetterRegex)) {
+        errors.value.password = 'Password must include at least one capital letter';
       } else {
         delete errors.value.password;
       }
@@ -78,7 +85,17 @@ const submit = () => {
   const { name, username, password } = form.value;
   axios
     .post(`${API_URL}/auth/register`, { name, username, password })
-    .then(() => {
+    .then((res) => {
+      localStorage.removeItem('userId');
+      localStorage.removeItem('username');
+      localStorage.removeItem('name');
+      localStorage.removeItem('followedUsers');
+      localStorage.removeItem('blockedUsers');
+      localStorage.setItem('userId', res.data.userId);
+      localStorage.setItem('name', res.data.name);
+      localStorage.setItem('username', res.data.username);
+      localStorage.setItem('followedUsers', JSON.stringify([]));
+      localStorage.setItem('blockedUsers', JSON.stringify([]));
       router.push('/user/my-feed');
     })
     .catch((e) => {
@@ -91,7 +108,7 @@ const submit = () => {
   <article class="register-form-panel">
     <form @submit.prevent="submit" class="register-form">
       <div class="input-wrapper">
-        <label for="name">Name</label>
+        <label for="name">Name*</label>
         <input
           id="name"
           v-model="form.name"
@@ -103,7 +120,7 @@ const submit = () => {
       </div>
 
       <div class="input-wrapper">
-        <label for="username">Username</label>
+        <label for="username">Username*</label>
         <input
           id="username"
           v-model="form.username"
@@ -117,7 +134,7 @@ const submit = () => {
       </div>
 
       <div class="input-wrapper">
-        <label for="password">Password</label>
+        <label for="password">Password*</label>
         <input
           id="password"
           v-model="form.password"
@@ -131,7 +148,7 @@ const submit = () => {
       </div>
 
       <div class="input-wrapper">
-        <label for="confirm-password">Confirm Password</label>
+        <label for="confirm-password">Confirm Password*</label>
         <input
           id="confirm-password"
           v-model="form.confirmPassword"
@@ -161,6 +178,7 @@ const submit = () => {
   flex-direction: column;
   gap: 1rem;
   align-items: center;
+  min-width: 22rem;
   width: 100%;
 
   .input-wrapper {
@@ -169,9 +187,8 @@ const submit = () => {
     flex-direction: column;
     gap: 0.5rem;
 
-    .error-message {
-      color: red;
-      font-size: 0.875rem;
+    input {
+      width: 100%;
     }
   }
 

@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { useModal } from '@/modules/shared/composables/useModal';
 import ModalComponent from '@/modules/shared/components/ModalComponent.vue';
-import LoginView from './LoginView.vue';
-import RegisterView from './RegisterView.vue';
+import LoginModalContent from '../components/LoginModalContentComponent.vue';
+import RegisterModalContent from '../components/RegisterModalContentComponent.vue';
 
 const { isModalOpen, modalTitle, modalContent, openModal, closeModal } = useModal();
 
 const openLoginModal = () => {
-  openModal('Login', LoginView); // Pass the title and component
+  openModal('Login', LoginModalContent);
 };
 
 const openRegisterModal = () => {
-  openModal('Register', RegisterView); // Pass the title and component
+  openModal('Register', RegisterModalContent);
 };
 </script>
 

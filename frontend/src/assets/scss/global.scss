@@ -1,7 +1,6 @@
 @use 'variables' as *;
 @forward 'button';
-@forward 'link';
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css');
+@import 'primeicons/primeicons.css';
 
 * {
   font-family: $primary-font;
@@ -48,12 +47,13 @@ input:-webkit-autofill {
 
 input,
 textarea {
+  box-sizing: border-box;
   color: white;
   background-color: black;
 }
 
 input {
-  height: 2rem;
+  height: 2.5rem;
   border-radius: 0.25rem;
   width: 15rem;
   filter: none;
@@ -80,4 +80,9 @@ input {
     display: block;
     padding-bottom: 0.25rem;
   }
+}
+
+.error-message {
+  color: red;
+  font-size: 0.875rem;
 }

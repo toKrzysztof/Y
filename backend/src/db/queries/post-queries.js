@@ -47,7 +47,7 @@ const deletePost = async (session, postId) => {
   );
 };
 
-const getPostsMadeByUser = async (session, userId, skip, limit) => {
+const getPostsMadeByUser = async (session, username, skip, limit) => {
   // returns 0 even though there are records
   // const totalRecords = await session
   //   .query(
@@ -58,26 +58,24 @@ const getPostsMadeByUser = async (session, userId, skip, limit) => {
 
   const totalRecords = await session
     .query(
-      injectRids(
-        `SELECT COUNT(*) as totalRecords FROM Post WHERE in('HasPost').@rid = :userId`,
-        { userId }
-      )
+      `SELECT COUNT(*) as totalRecords FROM Post WHERE in('HasPost').username = :username`,
+      { params: { username } }
     )
     .one();
 
   const content = await session
     .query(
-      `MATCH {Class: User, as: user, where: (@rid = :userId)}-HasPost->{Class: Post, as: post}-HasReply->{Class: Post, as: reply, optional: true}
+      `MATCH {Class: User, as: user, where: (username = :username)}-HasPost->{Class: Post, as: post}-HasReply->{Class: Post, as: reply, optional: true}
       RETURN
       user.username as authorUsername,
       user.name as authorName,
-      post.@rid as postId,
+      post.@rid as id,
       post.content as content,
       post.createdAt as createdAt,
       post.updatedAt as updatedAt,
       post.links as links
       GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
-      { params: { userId, skip: parseInt(skip), limit: parseInt(limit) } }
+      { params: { username, skip: parseInt(skip), limit: parseInt(limit) } }
     )
     .all();
 
@@ -177,9 +175,6 @@ const getNewestPosts = async (session, skip, limit) => {
   // const totalRecords = await session.query(
   //   "SELECT FROM POST WHERE first(in(HasPost).@rid) NOT IN (SELECT out('Blocks') FROM #userId"
   // );
-
-  console.log();
-
   const totalRecords = await session
     .query('SELECT COUNT(*) as totalRecords FROM POST')
     .one();
@@ -197,7 +192,8 @@ const getNewestPosts = async (session, skip, limit) => {
   const posts = await session
     .query(
       `MATCH {Class: User, as: user}-HasPost->{Class: Post, as: post}<-HasReply-{Class: Post, as: parentPost, optional: true}<-HasPost-{Class: User, as: parentPostAuthor, optional: true}
-RETURN post.@rid as id, post.content as content, post.createdAt as createdAt, post.links as links, user.username as authorUsername, user.name as authorName, parentPost.@rid as parentPostId, parentPostAuthor.username as parentPostAuthorUsername GROUP BY id ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
+RETURN post.@rid as id, post.content as content, post.createdAt as createdAt, post.links as links, user.username as authorUsername, user.name as authorName, parentPost.@rid as parentPostId, parentPostAuthor.username as parentPostAuthorUsername, post.out('HasReply') as replies
+ GROUP BY id ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
       { params: { skip: parseInt(skip), limit: parseInt(limit) } }
     )
     .all();
@@ -205,50 +201,105 @@ RETURN post.@rid as id, post.content as content, post.createdAt as createdAt, po
   return { count: totalRecords.totalRecords, content: posts };
 };
 
-const getNewestPostsWithFirstLevelReplies = async (session, userId, skip, limit) => {
+// const getNewestPostsWithFirstLevelReplies = async (session, userId, skip, limit) => {
+//   const totalRecords = await session
+//     .query(`SELECT COUNT(*) as totalRecords FROM Post`)
+//     .one();
+
+//   // Doing this at this layer, because other dbs have RAND() function which would normally be used inside the query
+//   const randomOffset =
+//     totalRecords.totalRecords - limit <= 0
+//       ? 0
+//       : Math.floor(Math.random() * (totalRecords.totalRecords - limit));
+
+//   const query = injectRids(
+//     `SELECT *, if(eval("comments[0].id IS NULL"), [], comments) as comments
+//       FROM (
+//         MATCH
+//             {Class: User, as: author}-HasPost->{Class: Post, as: post}-HasComment->{Class: Comment, as: comment, optional: true}
+//         RETURN
+//             post.@rid AS postId,
+//             post.createdAt AS createdAt,
+//             post.content AS content,
+//             post.updatedAt AS updatedAt,
+//             post.links AS links,
+//             author.username as username,
+//             author.name as name,
+//             set({
+//                 "id": comment.@rid,
+//                 "createdAt": comment.createdAt,
+//                 "content": comment.content,
+//                 "updatedAt": comment.updatedAt,
+//                 "username": comment.username
+//             }) AS comments
+//         GROUP BY postId
+//       )
+//       WHERE (authorId NOT IN (SELECT EXPAND( $combined ) LET $blockdBy = ( SELECT out as block FROM Blocks WHERE in=:userId ), $blocks = ( SELECT in as block FROM Blocks where out=:userId ), $combined = UNIONALL( $blockdBy, $blocks ))) SKIP :skip LIMIT :limit`,
+//     { userId }
+//   );
+
+//   const posts = await session
+//     .query(query, {
+//       params: { skip: randomOffset, limit }
+//     })
+//     .all();
+
+//   return { content: posts, count: totalRecords.totalRecords };
+// };
+
+const getPostReplies = async (session, postId, limit, skip) => {
   const totalRecords = await session
-    .query(`SELECT COUNT(*) as totalRecords FROM Post`)
+    .query(
+      `MATCH {Class: Post, as: post, where: (@rid = :postId)}-HasReply->{Class: Post, as: reply} return COUNT(*) as totalRecords`,
+
+      { params: { postId, skip: parseInt(skip), limit: parseInt(limit) } }
+    )
     .one();
 
-  // Doing this at this layer, because other dbs have RAND() function which would normally be used inside the query
-  const randomOffset =
-    totalRecords.totalRecords - limit <= 0
-      ? 0
-      : Math.floor(Math.random() * (totalRecords.totalRecords - limit));
-
-  const query = injectRids(
-    `SELECT *, if(eval("comments[0].id IS NULL"), [], comments) as comments
-      FROM (
-        MATCH
-            {Class: User, as: author}-HasPost->{Class: Post, as: post}-HasComment->{Class: Comment, as: comment, optional: true}
-        RETURN
-            post.@rid AS postId,
-            post.createdAt AS createdAt,
-            post.content AS content,
-            post.updatedAt AS updatedAt,
-            post.links AS links,
-            author.username as username,
-            author.name as name,
-            set({
-                "id": comment.@rid,
-                "createdAt": comment.createdAt,
-                "content": comment.content,
-                "updatedAt": comment.updatedAt,
-                "username": comment.username
-            }) AS comments
-        GROUP BY postId
-      )
-      WHERE (authorId NOT IN (SELECT EXPAND( $combined ) LET $blockdBy = ( SELECT out as block FROM Blocks WHERE in=:userId ), $blocks = ( SELECT in as block FROM Blocks where out=:userId ), $combined = UNIONALL( $blockdBy, $blocks ))) SKIP :skip LIMIT :limit`,
-    { userId }
-  );
-
-  const posts = await session
-    .query(query, {
-      params: { skip: randomOffset, limit }
-    })
+  const content = await session
+    .query(
+      `MATCH {Class: Post, as: post, where: (@rid = :postId)}-HasReply->{Class: Post, as: reply}<-HasPost-{Class: User, as: user}
+    RETURN
+    reply.@rid as id,
+    reply.createdAt as createdAt,
+    reply.updatedAt as updatedAt,
+    reply.content as content,
+    user.username as authorUsername,
+    user.name as authorName,
+    user.in("Follows") as follows
+    GROUP BY createdAt ORDER BY createdAt DESC
+    
+    SKIP :skip LIMIT :limit
+  `,
+      { params: { postId, skip: parseInt(skip), limit: parseInt(limit) } }
+    )
     .all();
 
-  return { content: posts, count: totalRecords.totalRecords };
+  return { content, count: totalRecords.totalRecords };
+};
+
+const findPost = async (session, postId) => {
+  return await session
+    .query(
+      injectRids(
+        `MATCH {Class: User, as: postAuthor}-HasPost->{Class: Post, as: post, where: (@rid = :postId)}<-HasReply-{Class: Post, as: parentPost, optional: true}<-HasPost-{Class: User, as: parentPostAuthor, optional: true}
+    RETURN
+    post.@rid as id,
+    post.content as content,
+    post.createdAt as createdAt,
+    postAuthor.name as authorName,
+    postAuthor.username as authorUsername,
+    post.links as links,
+    parentPost.@rid as parentPostId,
+    parentPostAuthor.username as parentPostAuthorUsername,
+    post.out('HasReply') as replies
+    `,
+        {
+          postId
+        }
+      )
+    )
+    .one();
 };
 
 module.exports = {
@@ -257,5 +308,7 @@ module.exports = {
   deletePost,
   getPostsMadeByUser,
   getPostsOfFollowedUsers,
-  getNewestPosts
+  getNewestPosts,
+  getPostReplies,
+  findPost
 };

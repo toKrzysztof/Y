@@ -5,6 +5,7 @@ const userFollowRoutes = require('./follow/user-follow-routes');
 const userMuteRoutes = require('./mute/user-mute-routes');
 const { jwtTokenValid } = require('../../middleware/auth-middleware');
 const userCommentRoutes = require('./comment/user-comment-routes');
+const userProfileRoutes = require('./profile/user-profile-routes');
 
 // authentication layer - must be first
 userRoutes.use(jwtTokenValid);
@@ -15,9 +16,8 @@ userRoutes.use('/user', [
   userBlockRoutes,
   userFollowRoutes,
   userCommentRoutes,
-  userMuteRoutes
+  userMuteRoutes,
+  userProfileRoutes
 ]);
-
-userRoutes.get('/');
 
 module.exports = userRoutes;

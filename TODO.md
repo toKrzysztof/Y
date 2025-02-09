@@ -22,4 +22,3 @@ autoryzacja modyfikowania, usuwania postów, komentarzy
 przenieść docker compose w root projektu
 ! walidacja mute, block, follow -> nie można siebie samego
 ! websockety
-! naprawić .env.local i .env.prod na backendzie

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const getOwnPosts = async (
+export const getUserPosts = async (
   baseFetchUrl: string,
   limit: number,
   skip: number

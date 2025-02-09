@@ -4,7 +4,19 @@ const findUser = async (session, username) => {
   return await session
     .query(
       `
-    SELECT @rid as id, password FROM User 
+    SELECT @rid as id, password, name FROM User 
+    WHERE username = :username
+  `,
+      { params: { username } }
+    )
+    .one();
+};
+
+const getUserDetails = async (session, username) => {
+  return await session
+    .query(
+      `
+    SELECT username, name, out('HasPost') as posts FROM User 
     WHERE username = :username
   `,
       { params: { username } }
@@ -202,5 +214,6 @@ module.exports = {
   muteUser,
   unmuteUser,
   blockUser,
-  unblockUser
+  unblockUser,
+  getUserDetails
 };

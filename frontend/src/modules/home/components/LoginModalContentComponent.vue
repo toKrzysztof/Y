@@ -24,9 +24,11 @@ const submit = (credentials: LoginCredentials) => {
     .then((res) => {
       localStorage.removeItem('userId');
       localStorage.removeItem('username');
+      localStorage.removeItem('name');
       localStorage.removeItem('followedUsers');
       localStorage.removeItem('blockedUsers');
       localStorage.setItem('userId', res.data.userId);
+      localStorage.setItem('name', res.data.name);
       localStorage.setItem('username', res.data.username);
       localStorage.setItem('followedUsers', JSON.stringify(res.data.followedUsers));
       localStorage.setItem('blockedUsers', JSON.stringify(res.data.blockedUsers));

@@ -1,32 +1,37 @@
 <script setup lang="ts">
 import LogoutButtonComponent from './LogoutButtonComponent.vue';
+
+const ownUsername = localStorage.getItem('username');
 </script>
 <template>
   <div class="sidebar">
     <ul class="navigation">
-      <li>
-        <!-- TODO - swap for routerlink -->
-        <a class="link-icon" href="/user/my-feed">
+      <li class="nav-link">
+        <RouterLink class="link-primary link-icon" to="/user/my-feed">
+          <i class="pi pi-home"></i>
           <span>Feed</span>
-        </a>
+        </RouterLink>
       </li>
-      <li>
-        <a class="link-icon" href="/user/explore">
+      <li class="nav-link">
+        <RouterLink class="link-primary link-icon" to="/user/explore">
+          <i class="pi pi-compass"></i>
           <span>Explore</span>
-        </a>
+        </RouterLink>
       </li>
-      <li>
-        <a class="link-icon" href="/user/chat">
+      <li class="nav-link">
+        <RouterLink class="link-primary link-icon" to="/user/chat">
+          <i class="pi pi-comments"></i>
           <span>Chat</span>
-        </a>
+        </RouterLink>
       </li>
-      <li>
-        <a class="link-icon" href="/user/profile">
-          <span>My profile</span>
-        </a>
+      <li class="nav-link">
+        <RouterLink class="link-primary link-icon" :to="`/user/${ownUsername}`">
+          <i class="pi pi-user"></i>
+          <span>Profile</span>
+        </RouterLink>
       </li>
+      <li class="logout-button"><LogoutButtonComponent /></li>
     </ul>
-    <LogoutButtonComponent />
   </div>
 </template>
 <style lang="scss" scoped>
@@ -40,7 +45,7 @@ import LogoutButtonComponent from './LogoutButtonComponent.vue';
   width: 100%;
   display: flex;
   flex-direction: column;
-  padding: 3rem 1rem;
+  padding: 3rem 2rem;
   justify-content: space-between;
   position: relative;
 }
@@ -51,5 +56,17 @@ import LogoutButtonComponent from './LogoutButtonComponent.vue';
   display: grid;
   gap: 1rem;
   list-style: none;
+}
+
+.nav-link {
+  height: fit-content;
+
+  i {
+    font-size: 1.25rem;
+  }
+}
+
+.logout-button {
+  margin-top: auto;
 }
 </style>

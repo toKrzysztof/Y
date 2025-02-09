@@ -8,6 +8,7 @@ interface ModalProps {
   content: Component | null;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const _ = defineProps<ModalProps>();
 
 const emit = defineEmits(['close']);
@@ -44,6 +45,7 @@ provide('closeModal', closeModal);
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal {
@@ -51,6 +53,8 @@ provide('closeModal', closeModal);
   padding: 1.25rem;
   border-radius: 0.5rem;
   width: fit-content;
+  position: absolute;
+  z-index: 1000;
 }
 
 .modal-header {
@@ -60,6 +64,7 @@ provide('closeModal', closeModal);
 
   h2 {
     margin-top: 0;
+    padding: 0 2rem;
   }
 
   .back-button {

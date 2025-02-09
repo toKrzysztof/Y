@@ -10,30 +10,53 @@ const {
 } = require('../../db/queries/user-queries');
 const { acquireDbSession, closeDbSession } = require('../../db/db-tools');
 const { dbSessionPool } = require('../../server');
+const { serializeRid } = require('../../db/orientjs/db-helpers');
 
 const jwtSecret = process.env.JWT_SECRET;
 
 authRoutes.post('/auth/register', async (req, res) => {
   try {
-    const { username, password, name, lastName } = req.body;
+    const { username, password, name } = req.body;
+
+    const session = await acquireDbSession(await dbSessionPool);
+    const user = await findUser(session, username);
+
+    if (user) {
+      return res.status(400).json({ message: 'Given username is already taken!' });
+    }
 
     const hashedPassword = genHash(password);
 
-    const session = await acquireDbSession(await dbSessionPool);
-    const createResponse = createUser(
+    const createResponse = await createUser(
       session,
       name,
-      lastName,
       username,
+      password,
       hashedPassword
     );
     closeDbSession(session);
 
+    const token = jwt.sign(
+      { userId: serializeRid(createResponse['@rid']), username },
+      jwtSecret,
+      {
+        expiresIn: '1h'
+      }
+    );
+
     if (createResponse === null) {
       return res.status(400).json({ message: 'Must select a unique username!' });
     } else {
+      res.cookie('auth-token', token, {
+        httpOnly: true,
+        sameSite: 'strict'
+      });
+
       return res.status(201).json({
-        message: `User „${username}” has been registered succesfully!`
+        message: `User „${username}” has been registered succesfully!`,
+        username,
+        name: user.name,
+        userId: user.id
       });
     }
   } catch (err) {
@@ -80,6 +103,7 @@ authRoutes.post('/auth/login', async (req, res) => {
     res.status(200).json({
       message: 'The authentication was successful!',
       username,
+      name: user.name,
       userId: user.id,
       followedUsers,
       blockedUsers

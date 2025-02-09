@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { Post } from '@/modules/user/models/post-model';
+import router from '@/router';
 
-const props = defineProps<{ post: Post }>();
+const props = defineProps<{ post: Post; threadView: boolean }>();
 
 const urlRegex =
   /(?<!\S)(https?:\/\/)?(?!-)[A-Za-z0-9-]{1,63}(?<!-)\.(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63}(?<!-))*(?!\S)/g;
@@ -50,24 +51,44 @@ const contentParts = computed(() => {
 
   return parts;
 });
+
+const encodeBase64 = (str: string) => {
+  return btoa(str);
+};
+
+const onClick = () => {
+  router.push(`/user/post/${btoa(props.post.id)}`);
+};
 </script>
 
 <template>
   <article>
     <div class="user-post-data">
       <header class="user-post-header">
-        <div class="user-post-primary-data font-grey">
-          <span class="user-post-name">{{ post.authorName }}</span>
-          <span class="user-post-username font-grey">@{{ post.authorUsername }}</span>
-          <span>-</span>
-          <span>{{ $formattedDate(post.createdAt) }}</span>
+        <div class="space-between">
+          <div class="user-post-primary-data font-grey">
+            <span class="user-post-name">{{ post.authorName }}</span>
+            <RouterLink
+              class="user-post-username font-grey"
+              :to="`/user/${props.post.authorUsername}`"
+              >@{{ post.authorUsername }}</RouterLink
+            >
+            <span>-</span>
+            <span>{{ $formattedDate(post.createdAt) }}</span>
+          </div>
+          <div v-show="threadView === false">
+            <button class="button-small button-primary" @click="onClick">
+              <i class="pi pi-chevron-right"></i>
+            </button>
+          </div>
         </div>
-        <div
+        <RouterLink
+          class="user-post-reply-info"
           v-if="post.parentPostId !== null && post.parentPostId !== undefined"
-          class="user-post-reply-info font-grey"
+          :to="'/user/post/' + encodeBase64(post.parentPostId)"
         >
           Replying to @{{ post.parentPostAuthorUsername }}
-        </div>
+        </RouterLink>
       </header>
       <p class="user-post-content">
         <template v-for="(part, index) in contentParts" :key="index">
@@ -79,6 +100,12 @@ const contentParts = computed(() => {
           </a>
         </template>
       </p>
+      <div class="post-data-icons font-grey">
+        <div class="post-data-icon-section">
+          <i class="pi pi-comment"></i>
+          <span>{{ post.replies?.length || 0 }}</span>
+        </div>
+      </div>
     </div>
   </article>
 </template>
@@ -103,15 +130,12 @@ const contentParts = computed(() => {
   a {
     color: #1da1f2;
     text-decoration: none;
+    display: inline;
 
     &:hover {
       text-decoration: underline;
     }
   }
-}
-
-.user-post-reply-info {
-  padding-top: 0.3125rem;
 }
 
 .user-post-header {
@@ -136,5 +160,28 @@ const contentParts = computed(() => {
 
 h4 {
   margin-bottom: 0.5rem;
+}
+
+.space-between {
+  display: flex;
+  justify-content: space-between;
+  min-height: 1.625rem;
+}
+
+.post-data-icons {
+  display: flex;
+  padding-top: 1rem;
+  font-size: 0.875rem;
+
+  .post-data-icon-section {
+    span {
+      font-size: 0.75rem;
+      padding-left: 0.25rem;
+    }
+  }
+}
+
+.user-post-reply-info {
+  color: #1da1f2;
 }
 </style>

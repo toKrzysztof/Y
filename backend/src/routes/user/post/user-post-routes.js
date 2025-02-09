@@ -5,17 +5,19 @@ const {
   getPostsOfFollowedUsers,
   getNewestPosts,
   createPost,
-  deletePost
+  deletePost,
+  getPostReplies,
+  findPost
 } = require('../../../db/queries/post-queries');
 const { dbSessionPool } = require('../../../server');
 
 // posts of a user
-userPostRoutes.get('/post/own-post', async (req, res) => {
+userPostRoutes.get('/post/user/:username', async (req, res) => {
   try {
-    const { userId } = req.user;
+    const { username } = req.params;
     const { skip, limit } = req.query;
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await getPostsMadeByUser(session, userId, skip, limit);
+    const data = await getPostsMadeByUser(session, username, skip, limit);
 
     closeDbSession(session);
     res.status(200).send(data);
@@ -25,7 +27,7 @@ userPostRoutes.get('/post/own-post', async (req, res) => {
   }
 });
 
-// random posts from non-blocked users
+// newest posts
 userPostRoutes.get('/post', async (req, res) => {
   try {
     const { userId } = req.user;
@@ -57,13 +59,28 @@ userPostRoutes.get('/post/follow', async (req, res) => {
   }
 });
 
+userPostRoutes.get('/post/:postId', async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { skip, limit } = req.query;
+    const session = await acquireDbSession(await dbSessionPool);
+    const data = await getNewestPosts(session, skip, limit);
+    closeDbSession(session);
+
+    res.status(200).send(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
+});
+
 userPostRoutes.post('/post', async (req, res) => {
   try {
-    const { content, links } = req.body;
+    const { content, links, parentId } = req.body;
     const { userId } = req.user;
 
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await createPost(session, content, links, userId);
+    const data = await createPost(session, content, links, userId, parentId || null);
     closeDbSession(session);
 
     res.status(200).send(data);
@@ -93,6 +110,37 @@ userPostRoutes.delete('/user/post/:postId', async (req, res) => {
     const { postId } = req.params;
     const session = await acquireDbSession(await dbSessionPool);
     const data = await deletePost(session, postId);
+    closeDbSession(session);
+
+    res.status(200).send(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
+});
+
+userPostRoutes.get('/post/reply/:replyId', async (req, res) => {
+  try {
+    const base64EncodedReplyId = req.params.replyId;
+    const decodedReplyId = atob(base64EncodedReplyId);
+    const session = await acquireDbSession(await dbSessionPool);
+    const data = await findPost(session, decodedReplyId);
+    closeDbSession(session);
+
+    res.status(200).send(data);
+  } catch (err) {
+    console.log(err);
+    res.status(500).send();
+  }
+});
+
+userPostRoutes.get('/post/reply/:replyId/reply', async (req, res) => {
+  try {
+    const { limit, skip } = req.query;
+    const base64EncodedCommentId = req.params.replyId;
+    const decodedCommentId = atob(base64EncodedCommentId);
+    const session = await acquireDbSession(await dbSessionPool);
+    const data = await getPostReplies(session, decodedCommentId, limit, skip);
     closeDbSession(session);
 
     res.status(200).send(data);

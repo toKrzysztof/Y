@@ -58,7 +58,6 @@ useInfiniteScroll(
   {
     distance: 50,
     canLoadMore: () => {
-      console.log('test');
       if (fetchingData.value === true) return false;
       if (
         typeof itemCount.value === 'number' &&
@@ -78,23 +77,27 @@ useInfiniteScroll(
       <slot name="regular-content"></slot>
       <template #fallback>Loading...</template>
     </Suspense>
-
-    <Suspense>
-      <slot name="itemList" :item-list="itemList"></slot>
-      <template #fallback>Loading...</template>
-    </Suspense>
-    <p v-show="fetchingData" class="loader">Fetching...</p>
-    <p
-      v-show="
-        !fetchingData && itemList.length === 0 && typeof noItemsMessage === 'string'
-      "
-    >
-      {{ noItemsMessage }}
-    </p>
+    <div class="item-list">
+      <Suspense>
+        <slot name="itemList" :item-list="itemList"></slot>
+        <template #fallback>Loading...</template>
+      </Suspense>
+      <p v-show="fetchingData" class="paragraph-center">Fetching...</p>
+      <p
+        v-show="
+          !fetchingData && itemList.length === 0 && typeof noItemsMessage === 'string'
+        "
+        class="paragraph-center"
+      >
+        {{ noItemsMessage }}
+      </p>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+@use '@/assets/scss/variables' as *;
+
 .scroll-page-content-wrapper {
   align-items: flex-start;
   display: flex;
@@ -104,10 +107,24 @@ useInfiniteScroll(
   height: 100vh;
   overflow-y: scroll;
   width: 100%;
-  padding-bottom: 2rem;
 }
 
 .item-list {
-  margin-bottom: 10rem;
+  width: 100%;
+  max-width: 38rem;
+  box-sizing: border-box;
+  border-right: 0.0625rem solid $border-grey;
+  min-height: calc(100% - 7rem);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.paragraph-center {
+  width: 100%;
+  margin-top: 0rem;
+  padding-top: 1rem;
+  text-align: center;
+  border-top: 0.0625rem solid $border-grey;
 }
 </style>

@@ -5,6 +5,7 @@ import { getPostsFromFollowedUsers } from '../api/get-posts-from-followed-users'
 import type { Post } from '../models/post-model';
 import { API_URL } from '@/config/env';
 import UserPostFormComponent from '../components/UserPostFormComponent.vue';
+const submitButtonLabels = { regularLabel: 'Post', loadingLabel: 'Posting...' };
 </script>
 
 <template>
@@ -15,7 +16,10 @@ import UserPostFormComponent from '../components/UserPostFormComponent.vue';
     :base-fetch-url="`${API_URL}/user/post/follow`"
   >
     <template #regular-content>
-      <UserPostFormComponent></UserPostFormComponent>
+      <UserPostFormComponent
+        :submit-button-labels="submitButtonLabels"
+        :content-placeholder="'What is happening?!'"
+      ></UserPostFormComponent>
     </template>
     <template #itemList="{ itemList }">
       <UserPostListComponent :post-list="(itemList as Post[])" />

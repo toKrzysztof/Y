@@ -1,9 +1,11 @@
 import { ref, type Ref } from 'vue';
 import axios from 'axios';
 import { API_URL } from '@/config/env';
-import router from '@/router';
 
-export const useFormSubmission = (content: Ref<string, string>) => {
+export const useFormSubmission = (
+  content: Ref<string, string>,
+  parentId: string | null
+) => {
   const isSubmitting = ref<boolean>(false);
 
   const submit = async (event: Event) => {
@@ -14,9 +16,9 @@ export const useFormSubmission = (content: Ref<string, string>) => {
 
     try {
       await axios.post(`${API_URL}/user/post`, {
-        content: content.value
+        content: content.value,
+        parentId: parentId ? atob(parentId) : null
       });
-      router.push('/user/profile');
     } catch (error) {
       console.error('Error submitting form:', error);
     } finally {

@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { API_URL } from '@/config/env';
-import router from '@/router';
-import axios from 'axios';
+import { useModal } from '@/modules/shared/composables/useModal';
+import LogoutModalContent from './LogoutModalContentComponent.vue';
+import ModalComponent from '@/modules/shared/components/ModalComponent.vue';
+
+const { isModalOpen, modalTitle, modalContent, openModal, closeModal } = useModal();
 
 const onClick = async () => {
-  axios
-    .post(`${API_URL}/auth/logout`)
-    .then(() => {
-      localStorage.removeItem('userId');
-      localStorage.removeItem('username');
-      localStorage.removeItem('followedUsers');
-      localStorage.removeItem('blockedUsers');
-      router.push('/home');
-    })
-    .catch(console.log);
+  openModal('Are you sure you want to log out?', LogoutModalContent);
 };
 </script>
 <template>
-  <div class="button-box">
-    <button v-on:click="onClick" class="button-primary">Logout</button>
-  </div>
+  <button v-on:click="onClick" class="button-primary button-icon">
+    <i class="pi pi-sign-out"></i><span>Logout</span>
+  </button>
+  <ModalComponent
+    :isOpen="isModalOpen"
+    :title="modalTitle"
+    :content="modalContent"
+    @close="closeModal"
+  />
 </template>
-<style lang="scss" scoped>
-.button-box {
-  display: flex;
-  justify-content: center;
+<style lang="scss" scoper>
+.button-icon {
+  i {
+    font-size: 1.25rem;
+  }
 }
 </style>

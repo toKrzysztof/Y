@@ -2,10 +2,19 @@
 import { useContent } from '../composables/useContent';
 import { useFormSubmission } from '../composables/useFormSubmission';
 
+interface UserPostFormProps {
+  contentPlaceholder: string;
+  submitButtonLabels: { regularLabel: string; loadingLabel: string };
+  parentId?: string;
+}
 const maxChars = 280;
+const props = defineProps<UserPostFormProps>();
+console.log('TEST', props, props.parentId || null);
 
 const { content, charsLeft } = useContent(maxChars);
-const { isSubmitting, submit } = useFormSubmission(content);
+const { isSubmitting, submit } = useFormSubmission(content, props.parentId || null);
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 </script>
 
 <template>
@@ -15,13 +24,13 @@ const { isSubmitting, submit } = useFormSubmission(content);
         <textarea
           v-model="content"
           name="content"
-          placeholder="What is happening?!"
+          :placeholder="contentPlaceholder"
           required
           maxlength="280"
           class="post-content"
           oninput='this.style.height = "";this.style.height = this.scrollHeight + "px"'
         ></textarea>
-        <span class="char-counter" :class="{ 'char-warning': charsLeft <= 20 }">
+        <span class="char-counter" :class="{ 'error-message': charsLeft <= 20 }">
           {{ charsLeft }} characters left
         </span>
       </div>
@@ -68,7 +77,11 @@ const { isSubmitting, submit } = useFormSubmission(content);
           :disabled="isSubmitting || !content.trim()"
           class="button-secondary"
         >
-          {{ isSubmitting ? 'Posting...' : 'Post' }}
+          {{
+            isSubmitting
+              ? props.submitButtonLabels.loadingLabel
+              : props.submitButtonLabels.regularLabel
+          }}
         </button>
       </div>
     </form>
