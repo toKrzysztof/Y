@@ -39,7 +39,8 @@ userMuteRoutes.post('/mute/:muteUsername', async (req, res) => {
 userMuteRoutes.delete('/mute/:muteUsername', async (req, res) => {
   try {
     const { userId } = req.user;
-    const { muteUsername } = req.user;
+    const { muteUsername } = req.params;
+
     const session = await acquireDbSession(await dbSessionPool);
     const data = await unmuteUser(session, userId, muteUsername);
     closeDbSession(session);

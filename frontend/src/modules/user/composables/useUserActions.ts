@@ -35,7 +35,7 @@ export function useUserActions(
         });
       return;
     }
-
+    console.log('HELLO');
     const actionPrefix = actionType === 'delete' ? 'un' : '';
     return openModal(
       `Are you sure you want to ${actionPrefix}${actionName} ${username}?`,

@@ -1,3 +1,4 @@
+const { serializeRid } = require('../orientjs/db-helpers');
 const { injectRids } = require('../orientjs/db-query-param-injectors');
 
 const createPost = async (session, content, links, userId, parentId = null) => {
@@ -63,10 +64,11 @@ const getPostsMadeByUser = async (session, username, skip, limit) => {
     )
     .one();
 
+  // return distinct not working :)
   const content = await session
     .query(
       `MATCH {Class: User, as: user, where: (username = :username)}-HasPost->{Class: Post, as: post}-HasReply->{Class: Post, as: reply, optional: true}
-      RETURN
+      RETURN DISTINCT
       user.username as authorUsername,
       user.name as authorName,
       post.@rid as id,
@@ -80,7 +82,17 @@ const getPostsMadeByUser = async (session, username, skip, limit) => {
     )
     .all();
 
-  return { count: totalRecords.totalRecords, content: content };
+  const seenIds = new Set();
+  const uniqueArray = content.filter((obj) => {
+    if (seenIds.has(serializeRid(obj?.id))) {
+      return false;
+    } else {
+      seenIds.add(serializeRid(obj?.id));
+      return true;
+    }
+  });
+
+  return { count: totalRecords.totalRecords, content: uniqueArray };
 };
 
 const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {

@@ -5,9 +5,12 @@ import axios from 'axios';
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import UserActions from './UserActions.vue';
+import UserUsersListComponent from './UserUsersListComponent.vue';
 
 const route = useRoute();
 const username = route.params.username;
+const ownUsername = localStorage.getItem('username');
+console.log(ownUsername);
 
 const user = ref({ username: '', name: '' });
 
@@ -43,18 +46,20 @@ onMounted(() => {
         ></UserActions>
       </div>
     </header>
-    <!-- <Suspense>
-        <FollowedUsersListComponent></FollowedUsersListComponent>
+    <div class="bottom-user-menu" v-if="username === ownUsername">
+      <Suspense>
+        <UserUsersListComponent :list-type="'follow'" />
         <template #fallback><p>Loading...</p></template>
       </Suspense>
       <Suspense>
-        <MutedUsersListComponent></MutedUsersListComponent>
+        <UserUsersListComponent :list-type="'mute'" />
         <template #fallback><p>Loading...</p></template>
       </Suspense>
       <Suspense>
-        <BlockedUsersListComponent></BlockedUsersListComponent>
+        <UserUsersListComponent :list-type="'block'" />
         <template #fallback><p>Loading...</p></template>
-      </Suspense> -->
+      </Suspense>
+    </div>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -86,5 +91,12 @@ onMounted(() => {
   display: flex;
   margin: auto;
   gap: 1rem;
+}
+
+.bottom-user-menu {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 1.5rem;
+  border-right: 0.0625rem solid $border-grey;
 }
 </style>

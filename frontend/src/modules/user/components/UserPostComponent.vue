@@ -12,7 +12,6 @@ const _post = ref<Post | null>();
 watch(
   () => props.post,
   (newpost) => {
-    'TESTEEE';
     _post.value = newpost;
   },
   { immediate: true }
@@ -67,7 +66,7 @@ const contentParts = computed(() => {
 
 const userBlocked = ref(isUserBlocked(props.post.authorUsername));
 const userMuted = ref(isUserMuted(props.post.authorUsername));
-const displayPost = ref(!(userBlocked.value === false || userMuted.value === false));
+const displayPost = ref(userBlocked.value === false && userMuted.value === false);
 
 const encodeBase64 = (str: string) => {
   return btoa(str);

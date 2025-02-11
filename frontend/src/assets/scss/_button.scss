@@ -166,4 +166,23 @@ a {
       cursor: not-allowed;
     }
   }
+
+  &.button-no-background {
+    background-color: transparent;
+    &:hover {
+      background-color: transparent;
+      text-decoration: underline;
+    }
+
+    &:active {
+      background-color: transparent;
+      text-decoration: underline;
+    }
+
+    &:focus {
+      text-decoration: underline;
+      outline: none;
+      box-shadow: 0 0 0 0;
+    }
+  }
 }
