@@ -2,7 +2,6 @@ const { serializeRid } = require('../orientjs/db-helpers');
 const { injectRids } = require('../orientjs/db-query-param-injectors');
 
 const createPost = async (session, content, links, userId, parentId = null) => {
-  console.log(content, links, userId, parentId);
   const post = await session
     .command(
       'CREATE VERTEX Post SET content = :content, links = :links, createdAt = :now, updatedAt = :now',

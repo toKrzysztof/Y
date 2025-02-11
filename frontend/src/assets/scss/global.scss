@@ -1,6 +1,6 @@
 @use 'variables' as *;
 @forward 'button';
-@import 'primeicons/primeicons.css';
+@use './icons.scss';
 
 * {
   font-family: $primary-font;

@@ -20,5 +20,3 @@ flaga secure na ciasteczkach jeżeli aplikacja uruchomiona w trybie produkcyjnym
 zmienić wszędzie na szukanie po username a nie userId jeżeli nie trzeba szukać po userId
 autoryzacja modyfikowania, usuwania postów, komentarzy
 przenieść docker compose w root projektu
-! walidacja mute, block, follow -> nie można siebie samego
-! websockety

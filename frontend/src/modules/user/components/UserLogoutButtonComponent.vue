@@ -11,7 +11,7 @@ const onClick = async () => {
 </script>
 <template>
   <button v-on:click="onClick" class="button-primary button-icon">
-    <i class="pi pi-sign-out"></i><span>Logout</span>
+    <i class="icon-sign-out"></i><span>Logout</span>
   </button>
   <ModalComponent
     :isOpen="isModalOpen"

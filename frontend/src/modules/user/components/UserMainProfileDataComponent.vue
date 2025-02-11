@@ -31,7 +31,7 @@ onMounted(() => {
   <div class="profile-data">
     <header class="header">
       <button class="button-small button-primary" @click="routeBack">
-        <i class="pi pi-chevron-left"></i>
+        <i class="icon-chevron-left"></i>
       </button>
       <div class="user-data">
         <h3>

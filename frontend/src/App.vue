@@ -9,8 +9,6 @@ import { RouterView } from 'vue-router';
 </template>
 
 <style lang="scss">
-// @import '@/assets/scss/global.scss';
-
 .wrapper {
   color: white;
   height: 100vh;

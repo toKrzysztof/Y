@@ -9,25 +9,25 @@ const ownUsername = localStorage.getItem('username');
       <ul class="navigation">
         <li class="nav-link">
           <RouterLink class="link-primary link-icon" to="/user/my-feed">
-            <i class="pi pi-home"></i>
+            <i class="icon-home"></i>
             <span>Feed</span>
           </RouterLink>
         </li>
         <li class="nav-link">
           <RouterLink class="link-primary link-icon" to="/user/explore">
-            <i class="pi pi-compass"></i>
+            <i class="icon-compass"></i>
             <span>Explore</span>
           </RouterLink>
         </li>
         <!-- <li class="nav-link">
         <RouterLink class="link-primary link-icon" to="/user/chat">
-          <i class="pi pi-comments"></i>
+          <i class="icon-comments"></i>
           <span>Chat</span>
         </RouterLink>
       </li> -->
         <li class="nav-link">
           <RouterLink class="link-primary link-icon" :to="`/user/${ownUsername}`">
-            <i class="pi pi-user"></i>
+            <i class="icon-user"></i>
             <span>Profile</span>
           </RouterLink>
         </li>

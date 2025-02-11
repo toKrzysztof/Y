@@ -104,7 +104,7 @@ const switchPostDisplay = () => {
           </div>
           <div v-show="threadView === false">
             <button class="button-small button-primary" @click="onClick">
-              <i class="pi pi-chevron-right"></i>
+              <i class="icon-chevron-right"></i>
             </button>
           </div>
         </div>
@@ -136,7 +136,7 @@ const switchPostDisplay = () => {
       <div class="post-footer">
         <div class="post-data-icons font-grey">
           <div class="post-data-icon-section">
-            <i class="pi pi-comment"></i>
+            <i class="icon-comment"></i>
             <span>{{ post.replies?.length || 0 }}</span>
           </div>
         </div>
