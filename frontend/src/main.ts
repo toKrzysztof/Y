@@ -5,6 +5,7 @@ import { plugin, defaultConfig } from '@formkit/vue';
 import App from './App.vue';
 import router from './router';
 import type { RouteLocationNormalizedLoaded, Router } from 'vue-router';
+import { createPinia } from 'pinia';
 
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
@@ -52,4 +53,6 @@ app.mixin({
 
 app.use(router);
 app.use(plugin, defaultConfig);
+const pinia = createPinia();
+app.use(pinia);
 app.mount('#app');

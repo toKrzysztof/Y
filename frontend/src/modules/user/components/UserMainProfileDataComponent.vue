@@ -10,7 +10,6 @@ import UserUsersListComponent from './UserUsersListComponent.vue';
 const route = useRoute();
 const username = route.params.username;
 const ownUsername = localStorage.getItem('username');
-console.log(ownUsername);
 
 const user = ref({ username: '', name: '' });
 

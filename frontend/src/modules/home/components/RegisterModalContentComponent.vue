@@ -98,9 +98,9 @@ const submit = () => {
         res.data.userId,
         res.data.name,
         res.data.username,
-        JSON.stringify(res.data.followedUsers),
-        JSON.stringify(res.data.blockedUsers),
-        JSON.stringify(res.data.mutedUsers)
+        JSON.stringify(res.data.followedUsers ?? []),
+        JSON.stringify(res.data.blockedUsers ?? []),
+        JSON.stringify(res.data.mutedUsers ?? [])
       );
       router.push('/user/my-feed');
     })

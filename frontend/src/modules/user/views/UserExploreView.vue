@@ -6,6 +6,7 @@ import { API_URL } from '@/config/env';
 import type { Post } from '../models/post-model';
 import UserPostFormComponent from '../components/UserPostFormComponent.vue';
 import type { InfiniteScrollContent } from '../models/infinite-scroll-content.model';
+
 const submitButtonLabels = { regularLabel: 'Post', loadingLabel: 'Posting...' };
 </script>
 <template>

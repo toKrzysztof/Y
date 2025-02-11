@@ -3,10 +3,18 @@ import { useModal } from '@/modules/shared/composables/useModal';
 import ModalComponent from '@/modules/shared/components/ModalComponent.vue';
 import LoginModalContent from '../components/LoginModalContentComponent.vue';
 import RegisterModalContent from '../components/RegisterModalContentComponent.vue';
+import axios from 'axios';
+import { API_URL } from '@/config/env';
+import router from '@/router';
 
 const { isModalOpen, modalTitle, modalContent, openModal, closeModal } = useModal();
 
-const openLoginModal = () => {
+const handleLogin = async () => {
+  axios
+    .get(`${API_URL}/auth/status`)
+    .then(() => router.push(`/user/my-feed`))
+    .catch((e) => console.log(e));
+
   openModal('Login', LoginModalContent);
 };
 
@@ -34,7 +42,7 @@ const openRegisterModal = () => {
           <div class="separator">
             <span class="separator-or">or</span>
           </div>
-          <button class="button-primary landing-page-button" @click="openLoginModal">
+          <button class="button-primary landing-page-button" @click="handleLogin">
             Log in
           </button>
         </div>

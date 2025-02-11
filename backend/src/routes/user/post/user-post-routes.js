@@ -10,6 +10,7 @@ const {
   findPost
 } = require('../../../db/queries/post-queries');
 const { dbSessionPool } = require('../../../server');
+const { postPublisher } = require('../../../websockets/publishers/postPublisher');
 
 // posts of a user
 userPostRoutes.get('/post/user/:username', async (req, res) => {
@@ -80,7 +81,9 @@ userPostRoutes.post('/post', async (req, res) => {
     const { userId } = req.user;
 
     const session = await acquireDbSession(await dbSessionPool);
+    console.log(parentId);
     const data = await createPost(session, content, links, userId, parentId || null);
+    postPublisher.publishNewPost(data);
     closeDbSession(session);
 
     res.status(200).send(data);

@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import { useContent } from '../composables/useContent';
 import { useFormSubmission } from '../composables/useFormSubmission';
+import { useLinks } from '../composables/useLinks';
 
 interface UserPostFormProps {
   contentPlaceholder: string;
   submitButtonLabels: { regularLabel: string; loadingLabel: string };
   parentId?: string;
 }
+
+const maxLinks = 3;
 const maxChars = 280;
 const props = defineProps<UserPostFormProps>();
 
 const { content, charsLeft } = useContent(maxChars);
-const { isSubmitting, submit } = useFormSubmission(content, props.parentId || null);
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const { links, newLink, linkError, addLink, removeLink } = useLinks(maxLinks);
+const { isSubmitting, submit } = useFormSubmission(
+  content,
+  links,
+  props.parentId || null
+);
 </script>
 
 <template>
@@ -34,21 +40,25 @@ const { isSubmitting, submit } = useFormSubmission(content, props.parentId || nu
         </span>
       </div>
 
-      <!-- <div class="flex">
-        <input
-          type="text"
-          v-model="newLink"
-          placeholder="Add link"
-          :disabled="links.length >= maxLinks"
-        />
-        <button
-          type="button"
-          @click="addLink"
-          class="button-small add-link"
-          :disabled="links.length >= maxLinks || !newLink.trim()"
-        >
-          Add Link
-        </button>
+      <div class="flex">
+        <div class="input-wrapper">
+          <input
+            type="text"
+            v-model="newLink"
+            placeholder="Add link"
+            :disabled="links.length >= maxLinks"
+          />
+        </div>
+        <div>
+          <button
+            type="button"
+            @click="addLink"
+            class="button-secondary button-small add-link"
+            :disabled="links.length >= maxLinks || !newLink.trim()"
+          >
+            Add link to image
+          </button>
+        </div>
       </div>
 
       <div v-if="linkError" class="error-message">
@@ -56,24 +66,29 @@ const { isSubmitting, submit } = useFormSubmission(content, props.parentId || nu
       </div>
 
       <ul v-if="links.length > 0">
-        <li v-for="(link, index) in links" :key="index">
-          <a
-            :href="link"
-            class="link-normal"
+        <li v-for="(link, index) in links" :key="index" class="post-image-group">
+          <img
+            :src="link"
             target="_blank"
             rel="noopener noreferrer"
-            >{{ link }}</a
-          >
-          <button type="button" @click="removeLink(index)" class="button-small">
-            x
-          </button>
+            class="post-image"
+          />
+          <div>
+            <button
+              type="button"
+              @click="removeLink(index)"
+              class="button-small button-x"
+            >
+              x
+            </button>
+          </div>
         </li>
-      </ul> -->
+      </ul>
 
       <div class="button-box">
         <button
           type="submit"
-          :disabled="isSubmitting || !content.trim()"
+          :disabled="isSubmitting || (!content.trim() && links.length === 0)"
           class="button-secondary"
         >
           {{
@@ -134,20 +149,15 @@ const { isSubmitting, submit } = useFormSubmission(content, props.parentId || nu
     color: #ff2d2d;
   }
 
-  input {
+  input,
+  .input-wrapper {
     width: 100%;
-    height: 1.5rem;
-
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.5;
-    }
   }
 
   .flex {
     display: flex;
     gap: 0.5rem;
-    align-items: flex-end;
+    align-items: center;
   }
 
   ul {
@@ -183,12 +193,16 @@ const { isSubmitting, submit } = useFormSubmission(content, props.parentId || nu
   font-size: 1.375rem;
 }
 
-.link-normal {
-  color: #1a73e8;
-  text-decoration: none;
+.post-image-group {
+  display: flex;
+  gap: 1rem;
+}
 
-  &:hover {
-    text-decoration: underline;
-  }
+.post-image {
+  width: 100%;
+
+  object-fit: contain;
+  max-height: 36rem;
+  max-width: 36rem;
 }
 </style>

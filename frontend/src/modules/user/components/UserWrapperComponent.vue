@@ -1,5 +1,22 @@
 <script setup lang="ts">
 import UserSidebarComponent from './UserSidebarComponent.vue';
+import { useSocket } from '../composables/useSocket';
+import { onUnmounted } from 'vue';
+import { useInfiniteScrollStore } from '../store/infiniteScrollStore';
+
+const infiniteScrollStore = useInfiniteScrollStore();
+
+const { socket } = useSocket();
+
+socket.emit('listen-for-posts');
+
+socket.on('new-post', (post) => {
+  infiniteScrollStore.addPost(post);
+});
+
+onUnmounted(() => {
+  socket.disconnect();
+});
 </script>
 <template>
   <div class="user-page">

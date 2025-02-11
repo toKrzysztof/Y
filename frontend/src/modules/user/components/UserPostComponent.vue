@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import type { Post } from '@/modules/user/models/post-model';
 import router from '@/router';
 import UserActionsTile from './UserActionsTile.vue';
@@ -7,50 +7,43 @@ import { isUserBlocked, isUserMuted } from '../utils/localStorageUtils';
 
 const props = defineProps<{ post: Post; threadView: boolean }>();
 
-const _post = ref<Post | null>();
-
-watch(
-  () => props.post,
-  (newpost) => {
-    _post.value = newpost;
-  },
-  { immediate: true }
-);
-
-const urlRegex =
-  /(?<!\S)(https?:\/\/)?(?!-)[A-Za-z0-9-]{1,63}(?<!-)\.(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63}(?<!-))*(?!\S)/g;
-
 const contentParts = computed(() => {
   const parts = [];
   let lastIndex = 0;
 
-  const matches = Array.from(props.post.content.matchAll(urlRegex));
+  const words = props.post.content.split(/\s+/);
 
-  for (const match of matches) {
-    const matchStart = match.index;
-    const matchEnd = matchStart + match[0].length;
+  for (const word of words) {
+    try {
+      const url = new URL(word);
 
-    const isFullMatch =
-      (matchStart === 0 || !/\S/.test(props.post.content[matchStart - 1])) &&
-      (matchEnd === props.post.content.length ||
-        !/\S/.test(props.post.content[matchEnd]));
-
-    if (isFullMatch) {
-      if (matchStart > lastIndex) {
+      if (lastIndex < props.post.content.indexOf(word, lastIndex)) {
         parts.push({
           type: 'text',
-          value: props.post.content.slice(lastIndex, matchStart)
+          value: props.post.content.slice(
+            lastIndex,
+            props.post.content.indexOf(word, lastIndex)
+          )
         });
       }
 
-      let url = match[0];
-      if (!url.startsWith('http://') && !url.startsWith('https://')) {
-        url = `https://${url}`;
+      parts.push({ type: 'link', value: url.toString() });
+
+      lastIndex = props.post.content.indexOf(word, lastIndex) + word.length;
+    } catch {
+      if (lastIndex < props.post.content.indexOf(word, lastIndex)) {
+        parts.push({
+          type: 'text',
+          value: props.post.content.slice(
+            lastIndex,
+            props.post.content.indexOf(word, lastIndex)
+          )
+        });
       }
 
-      parts.push({ type: 'link', value: url });
+      parts.push({ type: 'text', value: word });
 
-      lastIndex = matchEnd;
+      lastIndex = props.post.content.indexOf(word, lastIndex) + word.length;
     }
   }
 
@@ -133,6 +126,13 @@ const switchPostDisplay = () => {
           </a>
         </template>
       </p>
+      <div class="user-post-images" v-if="post.links?.length > 0">
+        <ul class="user-post-image-list">
+          <li v-for="image of post.links" :key="image" class="user-post-image">
+            <img :src="image" alt="image" />
+          </li>
+        </ul>
+      </div>
       <div class="post-footer">
         <div class="post-data-icons font-grey">
           <div class="post-data-icon-section">
@@ -276,6 +276,24 @@ h4 {
   align-items: center;
   display: flex;
   justify-content: space-between;
+  padding-top: 1rem;
+}
+
+.user-post-image-list {
+  list-style: none;
+  padding: 0;
+}
+
+.user-post-image {
+  img {
+    max-height: 36rem;
+    max-width: 36rem;
+    width: 100%;
+    object-fit: contain;
+  }
+}
+
+.user-post-images {
   padding-top: 1rem;
 }
 </style>

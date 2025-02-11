@@ -23,13 +23,7 @@ authRoutes.post('/auth/register', async (req, res) => {
 
     const hashedPassword = genHash(password);
 
-    const createResponse = await createUser(
-      session,
-      name,
-      username,
-      password,
-      hashedPassword
-    );
+    const createResponse = await createUser(session, name, username, hashedPassword);
     closeDbSession(session);
 
     if (createResponse === null) {

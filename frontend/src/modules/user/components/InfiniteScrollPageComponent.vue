@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, defineProps, onMounted, provide, ref } from 'vue';
+import { computed, defineProps, onMounted, provide, ref, watch } from 'vue';
 import { useInfiniteScroll } from '@vueuse/core';
 import type { PaginatedContent } from '@/modules/user/models/paginated-content.model';
 import type { InfiniteScrollContent } from '../models/infinite-scroll-content.model';
+import { useInfiniteScrollStore } from '../store/infiniteScrollStore';
 
 export interface InfiniteScrollControls {
   triggerReRender: () => void;
@@ -38,6 +39,25 @@ const triggerReRender = () => {
     (item as InfiniteScrollContent).key = new Date().toString();
     return item;
   });
+};
+
+const infiniteScrollStore = useInfiniteScrollStore();
+
+watch(
+  () => infiniteScrollStore.newPosts,
+  (newValue) => {
+    if (newValue.length > 0) {
+      prependItems(newValue);
+    }
+  },
+  { deep: true }
+);
+
+const prependItems = (newItems: unknown[]) => {
+  itemList.value = [...newItems, ...itemList.value].sort((itemA, itemB) =>
+    itemA.createdAt > itemB.createdAt ? -1 : -1
+  );
+  infiniteScrollStore.resetPosts();
 };
 
 provide('infiniteScrollControls', { triggerReRender });

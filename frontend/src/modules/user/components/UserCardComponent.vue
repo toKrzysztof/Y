@@ -9,14 +9,13 @@ const props = defineProps<{ user: User; actionType: 'block' | 'mute' | 'follow' 
 const { isModalOpen, modalTitle, modalContent, closeModal, openModal, modalProps } =
   useModal();
 
-const { userAction, userFollowed, userBlocked, userMuted } = useUserActions(
-  openModal,
-  props.user.username
-);
+const { userAction } = useUserActions(openModal, props.user.username);
 
 const deleteUserRelationship = (username: string) => {
-  userAction(props.actionType, 'delete', username).then(() => {
-    removeUserFromList();
+  userAction(props.actionType, 'delete', username).then((res) => {
+    if (res === 'confirm-action') {
+      removeUserFromList();
+    }
   });
 };
 

@@ -2,13 +2,13 @@ const { serializeRid } = require('../orientjs/db-helpers');
 const { injectRids } = require('../orientjs/db-query-param-injectors');
 
 const createPost = async (session, content, links, userId, parentId = null) => {
+  console.log(content, links, userId, parentId);
   const post = await session
     .command(
       'CREATE VERTEX Post SET content = :content, links = :links, createdAt = :now, updatedAt = :now',
       { params: { content, links, now: new Date() } }
     )
     .one();
-
   if (parentId !== null) {
     await session
       .command(
@@ -19,7 +19,6 @@ const createPost = async (session, content, links, userId, parentId = null) => {
       )
       .one();
   }
-
   await session
     .command(
       injectRids('CREATE EDGE HasPost FROM :userId TO :postId', {
@@ -28,7 +27,6 @@ const createPost = async (session, content, links, userId, parentId = null) => {
       })
     )
     .one();
-
   return post;
 };
 
@@ -67,7 +65,7 @@ const getPostsMadeByUser = async (session, username, skip, limit) => {
   // return distinct not working :)
   const content = await session
     .query(
-      `MATCH {Class: User, as: user, where: (username = :username)}-HasPost->{Class: Post, as: post}-HasReply->{Class: Post, as: reply, optional: true}
+      `MATCH {Class: User, as: user, where: (username = :username)}-HasPost->{Class: Post, as: post}<-HasReply-{Class: Post, as: parentPost, optional: true}<-HasPost-{Class: User, as: parentPostAuthor, optional: true}
       RETURN DISTINCT
       user.username as authorUsername,
       user.name as authorName,
@@ -76,7 +74,9 @@ const getPostsMadeByUser = async (session, username, skip, limit) => {
       post.createdAt as createdAt,
       post.updatedAt as updatedAt,
       post.out('HasReply') as replies,
-      post.links as links
+      post.links as links,
+      parentPost.@rid as parentPostId, parentPostAuthor.username as parentPostAuthorUsername
+
       GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
       { params: { username, skip: parseInt(skip), limit: parseInt(limit) } }
     )
@@ -167,7 +167,7 @@ const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
         RETURN
         follow.username as authorUsername,
         follow.name as authorName,
-        post.@rid as postId,
+        post.@rid as id,
         post.content as content,
         post.createdAt as createdAt,
         post.updatedAt as updatedAt,
@@ -279,6 +279,7 @@ const getPostReplies = async (session, postId, limit, skip) => {
     reply.updatedAt as updatedAt,
     reply.content as content,
     reply.out('HasReply') as replies,
+    reply.links as links,
     user.username as authorUsername,
     user.name as authorName,
     user.in("Follows") as follows

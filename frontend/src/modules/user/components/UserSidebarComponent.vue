@@ -4,40 +4,46 @@ import UserLogoutButtonComponent from './UserLogoutButtonComponent.vue';
 const ownUsername = localStorage.getItem('username');
 </script>
 <template>
-  <div class="sidebar">
-    <ul class="navigation">
-      <li class="nav-link">
-        <RouterLink class="link-primary link-icon" to="/user/my-feed">
-          <i class="pi pi-home"></i>
-          <span>Feed</span>
-        </RouterLink>
-      </li>
-      <li class="nav-link">
-        <RouterLink class="link-primary link-icon" to="/user/explore">
-          <i class="pi pi-compass"></i>
-          <span>Explore</span>
-        </RouterLink>
-      </li>
-      <!-- <li class="nav-link">
+  <div class="sidebar-wrapper">
+    <div class="sidebar">
+      <ul class="navigation">
+        <li class="nav-link">
+          <RouterLink class="link-primary link-icon" to="/user/my-feed">
+            <i class="pi pi-home"></i>
+            <span>Feed</span>
+          </RouterLink>
+        </li>
+        <li class="nav-link">
+          <RouterLink class="link-primary link-icon" to="/user/explore">
+            <i class="pi pi-compass"></i>
+            <span>Explore</span>
+          </RouterLink>
+        </li>
+        <!-- <li class="nav-link">
         <RouterLink class="link-primary link-icon" to="/user/chat">
           <i class="pi pi-comments"></i>
           <span>Chat</span>
         </RouterLink>
       </li> -->
-      <li class="nav-link">
-        <RouterLink class="link-primary link-icon" :to="`/user/${ownUsername}`">
-          <i class="pi pi-user"></i>
-          <span>Profile</span>
-        </RouterLink>
-      </li>
-      <li class="logout-button"><UserLogoutButtonComponent /></li>
-    </ul>
+        <li class="nav-link">
+          <RouterLink class="link-primary link-icon" :to="`/user/${ownUsername}`">
+            <i class="pi pi-user"></i>
+            <span>Profile</span>
+          </RouterLink>
+        </li>
+        <li class="logout-button"><UserLogoutButtonComponent /></li>
+      </ul>
+      <div class="own-username-wrapper">
+        <div class="margin-right font-grey">logged as</div>
+        <div class="own-username">{{ ownUsername }}</div>
+      </div>
+    </div>
   </div>
 </template>
 <style lang="scss" scoped>
 @use '@/assets/scss/variables' as *;
 
-.sidebar {
+.sidebar-wrapper {
   align-items: flex-end;
   box-sizing: border-box;
   border-right: 0.0625rem solid $border-grey;
@@ -68,5 +74,25 @@ const ownUsername = localStorage.getItem('username');
 
 .logout-button {
   margin-top: auto;
+}
+
+.own-username-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.own-username {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 5rem;
+  align-items: center;
+  height: 100%;
 }
 </style>

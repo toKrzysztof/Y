@@ -1,5 +1,4 @@
 import { ref } from 'vue';
-import axios from 'axios';
 import DOMPurify from 'dompurify';
 
 export const useLinks = (maxLinks: number) => {
@@ -11,47 +10,34 @@ export const useLinks = (maxLinks: number) => {
     return DOMPurify.sanitize(input);
   };
 
-  const isValidUrl = (url: string): boolean => {
-    try {
-      const parsedUrl = new URL(url);
-      return ['http:', 'https:'].includes(parsedUrl.protocol);
-    } catch (error) {
-      console.log(error);
-      return false;
-    }
-  };
-
   const validateLink = async (url: string): Promise<boolean> => {
-    try {
-      const headResponse = await axios.head(url);
-      return headResponse.status === 200;
-    } catch (headError) {
-      if (axios.isAxiosError(headError) && headError.response?.status === 405) {
-        try {
-          const getResponse = await axios.get(url);
-          return getResponse.status === 200;
-        } catch (getError) {
-          console.log(getError);
-          return false;
-        }
+    return new Promise((resolve) => {
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = `https://${url}`;
       }
-      return false;
-    }
+
+      const img = new Image();
+
+      img.onload = () => {
+        resolve(true);
+      };
+
+      img.onerror = () => {
+        resolve(false);
+      };
+
+      img.src = url;
+    });
   };
 
   const addLink = async () => {
     if (!newLink.value.trim() || links.value.length >= maxLinks) return;
 
-    if (!isValidUrl(newLink.value.trim())) {
-      linkError.value = 'Please enter a valid HTTP/HTTPS URL.';
-      return;
-    }
-
     const sanitizedLink = sanitizeInput(newLink.value.trim());
 
     const isValid = await validateLink(sanitizedLink);
     if (!isValid) {
-      linkError.value = 'The link is invalid or unreachable.';
+      linkError.value = 'The link does not point to an image or is unreachable.';
       return;
     }
 
