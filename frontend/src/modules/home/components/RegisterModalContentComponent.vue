@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { API_URL } from '@/config/env';
 import router from '@/router';
 import axios from 'axios';
+import { setLoggedInUserState } from '@/modules/user/utils/localStorageUtils';
 
 interface RegisterFormData {
   name: string;
@@ -28,6 +29,8 @@ const validateField = (field: keyof RegisterFormData) => {
     case 'name':
       if (!form.value.name.trim()) {
         errors.value.name = 'Name is required.';
+      } else if (form.value.name.length > 50) {
+        errors.value.name = 'Name cannot be longer than 50 characters.';
       } else {
         delete errors.value.name;
       }
@@ -37,7 +40,9 @@ const validateField = (field: keyof RegisterFormData) => {
       if (!form.value.username.trim()) {
         errors.value.username = 'Username is required.';
       } else if (form.value.username.length < 3) {
-        errors.value.username = 'Username must be at least 3 characters.';
+        errors.value.username = 'Username must be at least 3 characters long.';
+      } else if (form.value.username.length > 20) {
+        errors.value.username = 'Username cannot be longer than 20 characters';
       } else {
         delete errors.value.username;
       }
@@ -48,10 +53,12 @@ const validateField = (field: keyof RegisterFormData) => {
         errors.value.password = 'Password is required.';
       } else if (form.value.password.length < 8) {
         errors.value.password = 'Password must be at least 8 characters.';
+      } else if (form.value.password.length > 100) {
+        errors.value.password = 'Password cannot be longer than 100 characters.';
       } else if (!form.value.password.match(specialCharacterRegex)) {
-        errors.value.password = 'Password must include at least one special character';
+        errors.value.password = 'Password must include at least one special character.';
       } else if (!form.value.password.match(atLeastOneCapitalLetterRegex)) {
-        errors.value.password = 'Password must include at least one capital letter';
+        errors.value.password = 'Password must include at least one capital letter.';
       } else {
         delete errors.value.password;
       }
@@ -86,20 +93,24 @@ const submit = () => {
   axios
     .post(`${API_URL}/auth/register`, { name, username, password })
     .then((res) => {
-      localStorage.removeItem('userId');
-      localStorage.removeItem('username');
-      localStorage.removeItem('name');
-      localStorage.removeItem('followedUsers');
-      localStorage.removeItem('blockedUsers');
-      localStorage.setItem('userId', res.data.userId);
-      localStorage.setItem('name', res.data.name);
-      localStorage.setItem('username', res.data.username);
-      localStorage.setItem('followedUsers', JSON.stringify([]));
-      localStorage.setItem('blockedUsers', JSON.stringify([]));
+      localStorage.clear();
+      setLoggedInUserState(
+        res.data.userId,
+        res.data.name,
+        res.data.username,
+        JSON.stringify(res.data.followedUsers),
+        JSON.stringify(res.data.blockedUsers),
+        JSON.stringify(res.data.mutedUsers)
+      );
       router.push('/user/my-feed');
     })
     .catch((e) => {
-      console.log(`e: ${e}`);
+      if (
+        e.status === 400 &&
+        e.response.data.message === 'Must select a unique username!'
+      ) {
+        errors.value.username = 'This username is already taken.';
+      }
     });
 };
 </script>

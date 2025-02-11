@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useModal } from '@/modules/shared/composables/useModal';
-import LogoutModalContent from './LogoutModalContentComponent.vue';
+import LogoutModalContent from './UserLogoutModalContentComponent.vue';
 import ModalComponent from '@/modules/shared/components/ModalComponent.vue';
 
 const { isModalOpen, modalTitle, modalContent, openModal, closeModal } = useModal();

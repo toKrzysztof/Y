@@ -1,9 +1,22 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { Post } from '@/modules/user/models/post-model';
 import router from '@/router';
+import UserActionsTile from './UserActionsTile.vue';
+import { isUserBlocked, isUserMuted } from '../utils/localStorageUtils';
 
 const props = defineProps<{ post: Post; threadView: boolean }>();
+
+const _post = ref<Post | null>();
+
+watch(
+  () => props.post,
+  (newpost) => {
+    'TESTEEE';
+    _post.value = newpost;
+  },
+  { immediate: true }
+);
 
 const urlRegex =
   /(?<!\S)(https?:\/\/)?(?!-)[A-Za-z0-9-]{1,63}(?<!-)\.(?!-)[A-Za-z0-9-]{1,63}(?<!-)(\.[A-Za-z0-9-]{1,63}(?<!-))*(?!\S)/g;
@@ -52,6 +65,10 @@ const contentParts = computed(() => {
   return parts;
 });
 
+const userBlocked = ref(isUserBlocked(props.post.authorUsername));
+const userMuted = ref(isUserMuted(props.post.authorUsername));
+const displayPost = ref(!(userBlocked.value === false || userMuted.value === false));
+
 const encodeBase64 = (str: string) => {
   return btoa(str);
 };
@@ -59,22 +76,39 @@ const encodeBase64 = (str: string) => {
 const onClick = () => {
   router.push(`/user/post/${btoa(props.post.id)}`);
 };
+
+const switchPostDisplay = () => {
+  displayPost.value = !displayPost.value;
+};
 </script>
 
 <template>
   <article>
-    <div class="user-post-data">
+    <div
+      v-if="(userBlocked === false && userMuted === false) || displayPost === true"
+      class="user-post-data"
+    >
       <header class="user-post-header">
         <div class="space-between">
           <div class="user-post-primary-data font-grey">
             <span class="user-post-name">{{ post.authorName }}</span>
-            <RouterLink
-              class="user-post-username font-grey"
-              :to="`/user/${props.post.authorUsername}`"
-              >@{{ post.authorUsername }}</RouterLink
-            >
+            <div class="user-actions-popover-wrapper">
+              <RouterLink
+                class="user-post-username font-grey"
+                :to="`/user/${props.post.authorUsername}`"
+                >@{{ post.authorUsername }}</RouterLink
+              >
+              <div class="user-actions-wrapper">
+                <UserActionsTile
+                  :name="post.authorName"
+                  :username="post.authorUsername"
+                ></UserActionsTile>
+              </div>
+            </div>
             <span>-</span>
-            <span>{{ $formattedDate(post.createdAt) }}</span>
+            <span class="post-created-at-time">{{
+              $formattedDate(post.createdAt)
+            }}</span>
           </div>
           <div v-show="threadView === false">
             <button class="button-small button-primary" @click="onClick">
@@ -100,12 +134,41 @@ const onClick = () => {
           </a>
         </template>
       </p>
-      <div class="post-data-icons font-grey">
-        <div class="post-data-icon-section">
-          <i class="pi pi-comment"></i>
-          <span>{{ post.replies?.length || 0 }}</span>
+      <div class="post-footer">
+        <div class="post-data-icons font-grey">
+          <div class="post-data-icon-section">
+            <i class="pi pi-comment"></i>
+            <span>{{ post.replies?.length || 0 }}</span>
+          </div>
+        </div>
+        <div>
+          <button
+            class="button-primary button-extra-small"
+            @click="switchPostDisplay"
+            v-if="displayPost === true && (userBlocked || userMuted)"
+          >
+            Hide post
+          </button>
         </div>
       </div>
+    </div>
+    <div
+      class="post-hidden"
+      v-if="displayPost === false && (userBlocked === true || userMuted === true)"
+    >
+      <div class="font-grey" v-if="userBlocked === true">
+        This post was made by a person you blocked
+      </div>
+      <div class="font-grey" v-if="userMuted === true && userBlocked === false">
+        This post was made by a person you muted
+      </div>
+      <button
+        class="button-primary button-extra-small"
+        v-show="displayPost === false"
+        @click="switchPostDisplay"
+      >
+        Show post
+      </button>
     </div>
   </article>
 </template>
@@ -114,7 +177,6 @@ const onClick = () => {
 .user-post-primary-data {
   align-items: center;
   display: flex;
-  gap: 0.5rem;
 }
 
 .user-post-created-at {
@@ -170,7 +232,6 @@ h4 {
 
 .post-data-icons {
   display: flex;
-  padding-top: 1rem;
   font-size: 0.875rem;
 
   .post-data-icon-section {
@@ -182,6 +243,40 @@ h4 {
 }
 
 .user-post-reply-info {
+  width: fit-content;
   color: #1da1f2;
+}
+
+.user-actions-wrapper {
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+.user-actions-popover-wrapper {
+  display: flex;
+  padding-left: 0.5rem;
+}
+
+.user-actions-popover-wrapper:hover:deep(.user-actions-tile) {
+  opacity: 1;
+  z-index: 100;
+  transition: 200ms ease-in;
+}
+
+.post-created-at-time {
+  padding-left: 0.5rem;
+}
+
+.post-hidden {
+  align-self: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.post-footer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
 }
 </style>

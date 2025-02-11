@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { API_URL } from '@/config/env';
 import router from '@/router';
 import axios from 'axios';
+import { setLoggedInUserState } from '@/modules/user/utils/localStorageUtils';
 
 interface LoginCredentials {
   username: string;
@@ -18,23 +19,27 @@ const isFormValid = computed(() => {
   return form.value.username.trim() !== '' && form.value.password.trim() !== '';
 });
 
+const loginError = ref<string | null>(null);
+
 const submit = (credentials: LoginCredentials) => {
   axios
     .post(`${API_URL}/auth/login`, credentials)
     .then((res) => {
-      localStorage.removeItem('userId');
-      localStorage.removeItem('username');
-      localStorage.removeItem('name');
-      localStorage.removeItem('followedUsers');
-      localStorage.removeItem('blockedUsers');
-      localStorage.setItem('userId', res.data.userId);
-      localStorage.setItem('name', res.data.name);
-      localStorage.setItem('username', res.data.username);
-      localStorage.setItem('followedUsers', JSON.stringify(res.data.followedUsers));
-      localStorage.setItem('blockedUsers', JSON.stringify(res.data.blockedUsers));
+      localStorage.clear();
+      setLoggedInUserState(
+        res.data.userId,
+        res.data.name,
+        res.data.username,
+        JSON.stringify(res.data.followedUsers),
+        JSON.stringify(res.data.blockedUsers),
+        JSON.stringify(res.data.mutedUsers)
+      );
       router.push('/user/my-feed');
     })
     .catch((e) => {
+      if (e.status === 401) {
+        loginError.value = 'Provided login or password is incorrect.';
+      }
       console.log(`e: ${e}`);
     });
 };
@@ -60,6 +65,9 @@ const submit = (credentials: LoginCredentials) => {
           id="password"
           v-model="form.password"
         />
+      </div>
+      <div v-if="loginError" class="error-message">
+        {{ loginError }}
       </div>
       <button
         type="submit"

@@ -5,12 +5,13 @@ import UserPostListComponent from '../components/UserPostListComponent.vue';
 import { API_URL } from '@/config/env';
 import type { Post } from '../models/post-model';
 import UserPostFormComponent from '../components/UserPostFormComponent.vue';
+import type { InfiniteScrollContent } from '../models/infinite-scroll-content.model';
 const submitButtonLabels = { regularLabel: 'Post', loadingLabel: 'Posting...' };
 </script>
 <template>
   <InfiniteScrollPageComponent
     :fetchData="getPosts"
-    :postsPerPage="10"
+    :postsPerPage="15"
     :no-items-message="'No posts yet...'"
     :base-fetch-url="`${API_URL}/user/post`"
   >
@@ -21,7 +22,9 @@ const submitButtonLabels = { regularLabel: 'Post', loadingLabel: 'Posting...' };
       ></UserPostFormComponent>
     </template>
     <template #itemList="{ itemList }">
-      <UserPostListComponent :post-list="(itemList as Post[])" />
+      <UserPostListComponent
+        :post-list="(itemList as (Post & InfiniteScrollContent)[])"
+      />
     </template>
   </InfiniteScrollPageComponent>
 </template>

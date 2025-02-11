@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { defineProps, onMounted, ref } from 'vue';
+import { computed, defineProps, onMounted, provide, ref } from 'vue';
 import { useInfiniteScroll } from '@vueuse/core';
-import type { PaginatedContent } from '@/modules/user/models/paginated-content-model';
+import type { PaginatedContent } from '@/modules/user/models/paginated-content.model';
+import type { InfiniteScrollContent } from '../models/infinite-scroll-content.model';
+
+export interface InfiniteScrollControls {
+  triggerReRender: () => void;
+}
 
 interface Props<T> {
   fetchData: (
@@ -12,15 +17,30 @@ interface Props<T> {
   postsPerPage: number;
   noItemsMessage?: string;
   baseFetchUrl: string;
+  filterPredicate?: (item: T) => boolean;
 }
+const { fetchData, postsPerPage, noItemsMessage, baseFetchUrl, filterPredicate } =
+  defineProps<Props<unknown>>();
 
 const pageContentWrapper = ref(null);
 const itemList = ref<unknown[]>([]);
 const itemCount = ref<number | null>(null);
 const fetchingData = ref<boolean>(false);
+const filteredItemList = computed(() => {
+  if (filterPredicate) {
+    return itemList.value.filter(filterPredicate);
+  }
+  return itemList.value;
+});
 
-const { fetchData, postsPerPage, noItemsMessage, baseFetchUrl } =
-  defineProps<Props<unknown>>();
+const triggerReRender = () => {
+  itemList.value = itemList.value.map((item) => {
+    (item as InfiniteScrollContent).key = new Date().toString();
+    return item;
+  });
+};
+
+provide('infiniteScrollControls', { triggerReRender });
 
 onMounted(() => {
   fetchingData.value = true;
@@ -56,7 +76,7 @@ useInfiniteScroll(
     await getItemsOnScroll();
   },
   {
-    distance: 50,
+    distance: 25,
     canLoadMore: () => {
       if (fetchingData.value === true) return false;
       if (
@@ -79,13 +99,15 @@ useInfiniteScroll(
     </Suspense>
     <div class="item-list">
       <Suspense>
-        <slot name="itemList" :item-list="itemList"></slot>
+        <slot name="itemList" :item-list="filteredItemList"></slot>
         <template #fallback>Loading...</template>
       </Suspense>
       <p v-show="fetchingData" class="paragraph-center">Fetching...</p>
       <p
         v-show="
-          !fetchingData && itemList.length === 0 && typeof noItemsMessage === 'string'
+          !fetchingData &&
+          filteredItemList.length === 0 &&
+          typeof noItemsMessage === 'string'
         "
         class="paragraph-center"
       >

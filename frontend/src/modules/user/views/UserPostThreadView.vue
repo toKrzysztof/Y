@@ -4,11 +4,11 @@ import InfiniteScrollPageComponent from '../components/InfiniteScrollPageCompone
 import axios from 'axios';
 import { useRoute } from 'vue-router';
 import { API_URL } from '@/config/env';
-import { getCommentThreadReplies } from '../api/get-comment-thread-replies';
-import UserReplyListComponent from '../components/UserReplyListComponent.vue';
+import { getPostThreadReplies } from '../api/get-post-thread-replies';
 import UserPostComponent from '../components/UserPostComponent.vue';
 import router from '@/router';
 import type { Post } from '../models/post-model';
+import UserReplyListComponent from '../components/UserReplyListComponent.vue';
 
 const post = ref({
   id: '',
@@ -40,7 +40,7 @@ const routeBack = () => {
 </script>
 <template>
   <InfiniteScrollPageComponent
-    :fetch-data="getCommentThreadReplies"
+    :fetch-data="getPostThreadReplies"
     :posts-per-page="10"
     :base-fetch-url="`${API_URL}/user/post/reply/${postId}/reply`"
   >
@@ -56,7 +56,7 @@ const routeBack = () => {
           Reply
         </h3>
       </header>
-      <div class="user-post">
+      <div class="user-post" v-if="post.id !== ''">
         <UserPostComponent :post="post" :thread-view="true"></UserPostComponent>
       </div>
     </template>

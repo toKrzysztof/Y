@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { Post } from '@/modules/user/models/post-model';
 import UserPostComponent from './UserPostComponent.vue';
+import type { InfiniteScrollContent } from '../models/infinite-scroll-content.model';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const _ = defineProps<{ postList: Post[] }>();
+const props = defineProps<{ postList: (Post & InfiniteScrollContent)[] }>();
 </script>
 <template>
   <ol ref="listElement" class="post-list">
-    <li v-for="post in postList" v-bind:key="post.postId" class="user-post">
+    <li v-for="post in postList" :key="`${post.postId}-${post.key}`" class="user-post">
       <UserPostComponent :post="post" :threadView="false"></UserPostComponent>
     </li>
   </ol>

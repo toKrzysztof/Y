@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import LogoutButtonComponent from './LogoutButtonComponent.vue';
+import UserLogoutButtonComponent from './UserLogoutButtonComponent.vue';
 
 const ownUsername = localStorage.getItem('username');
 </script>
@@ -18,19 +18,19 @@ const ownUsername = localStorage.getItem('username');
           <span>Explore</span>
         </RouterLink>
       </li>
-      <li class="nav-link">
+      <!-- <li class="nav-link">
         <RouterLink class="link-primary link-icon" to="/user/chat">
           <i class="pi pi-comments"></i>
           <span>Chat</span>
         </RouterLink>
-      </li>
+      </li> -->
       <li class="nav-link">
         <RouterLink class="link-primary link-icon" :to="`/user/${ownUsername}`">
           <i class="pi pi-user"></i>
           <span>Profile</span>
         </RouterLink>
       </li>
-      <li class="logout-button"><LogoutButtonComponent /></li>
+      <li class="logout-button"><UserLogoutButtonComponent /></li>
     </ul>
   </div>
 </template>

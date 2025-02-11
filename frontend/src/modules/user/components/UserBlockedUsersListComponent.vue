@@ -4,7 +4,7 @@ import type { User } from '@/modules/user/models/user-model';
 import { API_URL } from '@/config/env';
 import axios from 'axios';
 import UserCardComponent from './UserCardComponent.vue';
-import { removeUserBlocked } from '../utils/userRelationshipsStorageUtils';
+import { removeUserBlocked } from '../utils/localStorageUtils';
 
 const blockedUsersList = ref<User[]>((await axios.get(`${API_URL}/user/block`)).data);
 
@@ -15,7 +15,7 @@ const unblockUser = (username: string) => {
   blockedUsersList.value = filteredUsers;
   axios
     .delete(`${API_URL}/user/block/${username}`)
-    .then((res) => {
+    .then(() => {
       removeUserBlocked(username);
     })
     .catch((e) => console.log(e));

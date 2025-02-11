@@ -20,6 +20,11 @@
     padding: 0.375rem 0.75rem;
     font-size: 0.875rem;
   }
+
+  &.button-extra-small {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
 }
 
 %button-interactions {
@@ -99,6 +104,60 @@ a {
       outline: none;
       box-shadow: 0 0 0 3px #b3dbfa;
       color: #ffffff;
+    }
+
+    &:disabled {
+      color: black;
+      background-color: #555555;
+      cursor: not-allowed;
+    }
+  }
+
+  &.button-danger,
+  &.link-danger {
+    @extend %button-base;
+    @extend %button-interactions;
+    background-color: #920f00;
+    color: #ffffff;
+
+    &:hover {
+      background-color: #c0392b;
+    }
+
+    &:active {
+      background-color: #e74c3c;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 0.1875rem #e0867c;
+    }
+
+    &:disabled {
+      color: black;
+      background-color: #555555;
+      cursor: not-allowed;
+    }
+  }
+
+  &.button-warn,
+  &.link-warn {
+    @extend %button-base;
+    @extend %button-interactions;
+    background-color: #925f00;
+    color: #ffffff;
+
+    &:hover {
+      background-color: #c07f2b;
+    }
+
+    &:active {
+      background-color: #e7973c;
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 0.1875rem #e0ae7c;
     }
 
     &:disabled {

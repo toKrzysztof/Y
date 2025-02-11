@@ -6,7 +6,8 @@ const {
   createUser,
   findUser,
   findFollowedUsers,
-  findBlockedUsers
+  findBlockedUsers,
+  findMutedUsers
 } = require('../../db/queries/user-queries');
 const { acquireDbSession, closeDbSession } = require('../../db/db-tools');
 const { dbSessionPool } = require('../../server');
@@ -19,11 +20,6 @@ authRoutes.post('/auth/register', async (req, res) => {
     const { username, password, name } = req.body;
 
     const session = await acquireDbSession(await dbSessionPool);
-    const user = await findUser(session, username);
-
-    if (user) {
-      return res.status(400).json({ message: 'Given username is already taken!' });
-    }
 
     const hashedPassword = genHash(password);
 
@@ -36,6 +32,26 @@ authRoutes.post('/auth/register', async (req, res) => {
     );
     closeDbSession(session);
 
+    if (createResponse === null) {
+      return res.status(400).json({ message: 'Must select a unique username!' });
+    } else if (username.length < 3) {
+      return res
+        .status(400)
+        .json({ message: 'Username must be at least 3 characters long!' });
+    } else if (username.length > 20) {
+      return res
+        .status(400)
+        .json({ message: 'Username cannot be longer than 20 characters!' });
+    } else if (name.length > 50) {
+      return res
+        .status(400)
+        .json({ message: 'Name cannot be longer than 50 characters!' });
+    } else if (password.length > 100) {
+      return res
+        .status(400)
+        .json({ message: 'Password cannot be longer than 100 characters!' });
+    }
+
     const token = jwt.sign(
       { userId: serializeRid(createResponse['@rid']), username },
       jwtSecret,
@@ -44,21 +60,19 @@ authRoutes.post('/auth/register', async (req, res) => {
       }
     );
 
-    if (createResponse === null) {
-      return res.status(400).json({ message: 'Must select a unique username!' });
-    } else {
-      res.cookie('auth-token', token, {
-        httpOnly: true,
-        sameSite: 'strict'
-      });
+    console.log(createResponse);
 
-      return res.status(201).json({
-        message: `User „${username}” has been registered succesfully!`,
-        username,
-        name: user.name,
-        userId: user.id
-      });
-    }
+    res.cookie('auth-token', token, {
+      httpOnly: true,
+      sameSite: 'strict'
+    });
+
+    return res.status(201).json({
+      message: `User „${username}” has been registered succesfully!`,
+      username,
+      name,
+      userId: createResponse['@rid']
+    });
   } catch (err) {
     console.log(err);
     res.status(500).send();
@@ -94,6 +108,7 @@ authRoutes.post('/auth/login', async (req, res) => {
 
     const followedUsers = await findFollowedUsers(session, user.id);
     const blockedUsers = await findBlockedUsers(session, user.id);
+    const mutedUsers = await findMutedUsers(session, user.id);
 
     res.cookie('auth-token', token, {
       httpOnly: true,
@@ -106,7 +121,8 @@ authRoutes.post('/auth/login', async (req, res) => {
       name: user.name,
       userId: user.id,
       followedUsers,
-      blockedUsers
+      blockedUsers,
+      mutedUsers
     });
   } catch (err) {
     console.log(err);

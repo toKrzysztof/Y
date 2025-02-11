@@ -73,6 +73,7 @@ const getPostsMadeByUser = async (session, username, skip, limit) => {
       post.content as content,
       post.createdAt as createdAt,
       post.updatedAt as updatedAt,
+      post.out('HasReply') as replies,
       post.links as links
       GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
       { params: { username, skip: parseInt(skip), limit: parseInt(limit) } }
@@ -158,6 +159,7 @@ const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
         post.content as content,
         post.createdAt as createdAt,
         post.updatedAt as updatedAt,
+        post.out('HasReply') as replies,
         post.links AS links,
         parentPost.@rid as parentPostId, parentPostAuthor.username as parentPostAuthorUsername
         GROUP BY createdAt ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
@@ -264,6 +266,7 @@ const getPostReplies = async (session, postId, limit, skip) => {
     reply.createdAt as createdAt,
     reply.updatedAt as updatedAt,
     reply.content as content,
+    reply.out('HasReply') as replies,
     user.username as authorUsername,
     user.name as authorName,
     user.in("Follows") as follows

@@ -9,7 +9,6 @@ interface UserPostFormProps {
 }
 const maxChars = 280;
 const props = defineProps<UserPostFormProps>();
-console.log('TEST', props, props.parentId || null);
 
 const { content, charsLeft } = useContent(maxChars);
 const { isSubmitting, submit } = useFormSubmission(content, props.parentId || null);

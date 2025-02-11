@@ -10,11 +10,7 @@ const logout = async () => {
   axios
     .post(`${API_URL}/auth/logout`)
     .then(() => {
-      localStorage.removeItem('userId');
-      localStorage.removeItem('username');
-      localStorage.removeItem('name');
-      localStorage.removeItem('followedUsers');
-      localStorage.removeItem('blockedUsers');
+      localStorage.clear();
       router.push('/');
     })
     .catch(console.log);

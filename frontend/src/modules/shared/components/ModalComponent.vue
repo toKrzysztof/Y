@@ -6,6 +6,7 @@ interface ModalProps {
   isOpen: boolean;
   title: string;
   content: Component | null;
+  contentProps?: Record<string, unknown>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -13,8 +14,8 @@ const _ = defineProps<ModalProps>();
 
 const emit = defineEmits(['close']);
 
-function closeModal(): void {
-  emit('close');
+function closeModal(props?: unknown): void {
+  emit('close', props);
 }
 
 provide('closeModal', closeModal);
@@ -28,13 +29,13 @@ provide('closeModal', closeModal);
         <h2>{{ title }}</h2>
       </div>
       <div class="modal-body">
-        <component :is="content" v-if="content" />
+        <component :is="content" v-if="content" v-bind="contentProps" />
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -65,6 +66,7 @@ provide('closeModal', closeModal);
   h2 {
     margin-top: 0;
     padding: 0 2rem;
+    color: white;
   }
 
   .back-button {

@@ -1,115 +1,60 @@
 <script setup lang="ts">
-import { API_URL } from '@/config/env';
-import axios from 'axios';
-import { ref } from 'vue';
-import {
-  addUserBlocked,
-  addUserFollowed,
-  isUserBlocked,
-  isUserFollowed,
-  removeUserBlocked,
-  removeUserFollowed
-} from '../utils/userRelationshipsStorageUtils';
-
-const props = defineProps<{ username: string }>();
-const ownUsername = localStorage.getItem('username');
-const userFollowed = ref(isUserFollowed(props.username));
-const userBlocked = ref(isUserBlocked(props.username));
-
-const follow = (username: string) => {
-  userFollowed.value = true;
-  axios
-    .post(`${API_URL}/user/follow/${username}`)
-    .then(() => {
-      addUserFollowed(username);
-    })
-    .catch((e) => {
-      console.log(e);
-      userFollowed.value = false;
-    });
-};
-
-const unfollow = (username: string) => {
-  userFollowed.value = false;
-  axios
-    .delete(`${API_URL}/user/follow/${username}`)
-    .then(() => {
-      removeUserFollowed(username);
-    })
-    .catch((e) => {
-      console.log(e);
-      userFollowed.value = true;
-    });
-};
-
-const block = (username: string) => {
-  userBlocked.value = true;
-  axios
-    .post(`${API_URL}/user/block/${username}`)
-    .then(() => {
-      addUserBlocked(username);
-    })
-    .catch((e) => {
-      console.log(e);
-      userBlocked.value = false;
-    });
-};
-
-const unblock = (username: string) => {
-  userBlocked.value = false;
-  axios
-    .delete(`${API_URL}/user/block/${username}`)
-    .then(() => {
-      removeUserBlocked(username);
-    })
-    .catch((e) => {
-      console.log(e);
-      userBlocked.value = true;
-    });
-};
+import UserActions from './UserActions.vue';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const props = defineProps<{ name: string; username: string }>();
 </script>
+
 <template>
   <div class="user-actions-tile">
-    <span class="user-comment-author-username">{{ username }}</span>
-
-    <button
-      v-if="!userFollowed && username !== ownUsername"
-      @click="() => follow(username)"
-      class="button-small button-primary"
+    <div class="user-header">
+      <div class="user-name">{{ name }}</div>
+      <UserActions :name="name" :username="username"></UserActions>
+    </div>
+    <RouterLink class="user-username font-grey" :to="`/user/${username}`"
+      >@{{ username }}</RouterLink
     >
-      follow
-    </button>
-    <button
-      v-if="userFollowed && username !== ownUsername"
-      @click="() => unfollow(username)"
-      class="button-small button-primary"
-    >
-      unfollow
-    </button>
-    <button
-      v-if="!userBlocked && username !== ownUsername"
-      @click="() => block(username)"
-      class="button-small button-primary"
-    >
-      block
-    </button>
-    <button
-      v-if="userBlocked && username !== ownUsername"
-      @click="() => unblock(username)"
-      class="button-small button-primary"
-    >
-      unblock
-    </button>
   </div>
 </template>
+
 <style lang="scss" scoped>
 .user-comment-author-username {
   font-weight: 700;
 }
 
-.user-actions-tile {
-  display: flex;
-  gap: 0.5rem;
+.user-username {
+  width: fit-content;
+}
+
+.user-name {
+  color: white;
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+
+.user-header {
   align-items: center;
+  gap: 0.75rem;
+  display: flex;
+  padding-bottom: 0.25rem;
+}
+
+.user-actions-tile {
+  opacity: 0;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  position: absolute;
+  background-color: black;
+  box-shadow: 0 0 0.625rem #ffffff33;
+  top: -100%;
+  transition: 200ms ease-in;
+  z-index: -100;
+
+  :hover {
+    opacity: 1;
+  }
+}
+
+:deep(.user-actions) {
+  padding-bottom: 0.25rem;
 }
 </style>

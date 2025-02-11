@@ -14,11 +14,13 @@
   },
   "dependencies": {
     "@formkit/vue": "^1.6.9",
+    "@types/lodash": "^4.17.15",
     "@types/lodash.clonedeep": "^4.5.9",
     "@types/lodash.isequal": "^4.5.8",
     "@vueuse/core": "^12.4.0",
     "axios": "^1.7.9",
     "dompurify": "^3.2.4",
+    "lodash": "^4.17.21",
     "lodash.clonedeep": "^4.5.0",
     "lodash.isequal": "^4.5.0",
     "primeicons": "^7.0.0",

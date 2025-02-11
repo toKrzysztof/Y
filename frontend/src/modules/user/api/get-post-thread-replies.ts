@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const getCommentThreadReplies = async (
+export const getPostThreadReplies = async (
   baseUrl: string,
   limit: number,
   skip: number
