@@ -178,6 +178,18 @@ const blockUser = async (session, userId, blockedUsername) => {
     )
     .all();
 
+  // make user unfollow on block
+  await session
+    .command(
+      `
+    DELETE EDGE Follows 
+    WHERE in.@rid = :userId 
+    AND out.username = :unfollowedUsername
+  `,
+      { params: { userId, unfollowedUsername: blockedUsername } }
+    )
+    .all();
+
   if (!existingEdge) {
     const query = injectRids(
       `CREATE EDGE Blocks FROM :userId TO (SELECT FROM User WHERE username = :blockedUsername)`,
