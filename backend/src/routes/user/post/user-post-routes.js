@@ -34,7 +34,7 @@ userPostRoutes.get('/post', async (req, res) => {
     const { userId } = req.user;
     const { skip, limit } = req.query;
     const session = await acquireDbSession(await dbSessionPool);
-    const data = await getNewestPosts(session, skip, limit);
+    const data = await getNewestPosts(session, skip, limit, userId);
     closeDbSession(session);
 
     res.status(200).send(data);

@@ -183,13 +183,24 @@ const getPostsOfFollowedUsers = async (session, userId, skip, limit) => {
   return { count: totalRecords.totalRecords, content: content };
 };
 
-const getNewestPosts = async (session, skip, limit) => {
+const getNewestPosts = async (session, skip, limit, userId) => {
   // blocked users' posts filtered
   // const totalRecords = await session.query(
   //   "SELECT FROM POST WHERE first(in(HasPost).@rid) NOT IN (SELECT out('Blocks') FROM #userId"
   // );
+  const usersBlockingUser = await session
+    .query(injectRids("SELECT in('Blocks') as blocks FROM :userId", { userId }))
+    .one();
+
   const totalRecords = await session
-    .query('SELECT COUNT(*) as totalRecords FROM POST')
+    .query(
+      `SELECT COUNT(*) as totalRecords FROM (
+MATCH {Class: User, as: user}-HasPost->{Class: Post, as: post}
+RETURN
+user.@rid as id
+) WHERE id NOT IN :usersBlockingUser`,
+      { params: { usersBlockingUser: usersBlockingUser?.blocks } }
+    )
     .one();
 
   // blocked users' posts filtered
@@ -204,10 +215,17 @@ const getNewestPosts = async (session, skip, limit) => {
 
   const posts = await session
     .query(
-      `MATCH {Class: User, as: user}-HasPost->{Class: Post, as: post}<-HasReply-{Class: Post, as: parentPost, optional: true}<-HasPost-{Class: User, as: parentPostAuthor, optional: true}
-RETURN post.@rid as id, post.content as content, post.createdAt as createdAt, post.links as links, user.username as authorUsername, user.name as authorName, parentPost.@rid as parentPostId, parentPostAuthor.username as parentPostAuthorUsername, post.out('HasReply') as replies
- GROUP BY id ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
-      { params: { skip: parseInt(skip), limit: parseInt(limit) } }
+      `SELECT FROM (MATCH {Class: User, as: user}-HasPost->{Class: Post, as: post}<-HasReply-{Class: Post, as: parentPost, optional: true}<-HasPost-{Class: User, as: parentPostAuthor, optional: true}
+RETURN post.@rid as id, post.content as content, post.createdAt as createdAt, post.links as links, user.username as authorUsername, user.name as authorName, user.@rid as authorId, parentPost.@rid as parentPostId, parentPostAuthor.username as parentPostAuthorUsername, post.out('HasReply') as replies)
+WHERE authorId NOT IN :usersBlockingUser
+GROUP BY id ORDER BY createdAt DESC SKIP :skip LIMIT :limit`,
+      {
+        params: {
+          skip: parseInt(skip),
+          limit: parseInt(limit),
+          usersBlockingUser: usersBlockingUser?.blocks
+        }
+      }
     )
     .all();
 
