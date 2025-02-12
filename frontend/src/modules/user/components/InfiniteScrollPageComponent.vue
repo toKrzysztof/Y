@@ -54,9 +54,11 @@ watch(
 );
 
 const prependItems = (newItems: unknown[]) => {
-  itemList.value = [...newItems, ...itemList.value].sort((itemA, itemB) =>
-    itemA.createdAt > itemB.createdAt ? -1 : -1
-  );
+  itemList.value = [...newItems, ...itemList.value].sort((itemA, itemB) => {
+    if (itemA.createdAt > itemB.createdAt) return -1;
+    if (itemA.createdAt < itemB.createdAt) return 1;
+    return 0;
+  });
   infiniteScrollStore.resetPosts();
 };
 
