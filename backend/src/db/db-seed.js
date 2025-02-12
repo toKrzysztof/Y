@@ -48,13 +48,17 @@ const populateClasses = (session) => {
           createPost(
             session,
             'Hello everyone! This is my first post here.',
-            ['https://cataas.com/cat'],
+            [
+              'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB_PC93m0bHPZUpGZ1yen5N6-9dRT0Se_18A&s'
+            ],
             alice['@rid']
           ),
           createPost(
             session,
             'Perfect day for a picnic in the park!',
-            ['https://cataas.com/cat'],
+            [
+              'https://cdn.britannica.com/34/235834-050-C5843610/two-different-breeds-of-cats-side-by-side-outdoors-in-the-garden.jpg'
+            ],
             bob['@rid']
           )
         ]);
@@ -63,14 +67,18 @@ const populateClasses = (session) => {
           createPost(
             session,
             'Welcome Alice! Great to see you here!',
-            ['https://cataas.com/cat'],
+            [
+              'https://media.4-paws.org/a/f/1/e/af1e8ffc278258492c580ef1a4d574cb8e0c6035/Molly_006-2829x1886-2829x1414-600x300.jpg'
+            ],
             bob['@rid'],
             alicePost['@rid']
           ),
           createPost(
             session,
             'Thanks for sharing!',
-            ['https://cataas.com/cat'],
+            [
+              'https://static1.squarespace.com/static/607f89e638219e13eee71b1e/60a5de2d343ab05906685029/646c549369f8011c28cd5843/1684821591871/michael-sum-LEpfefQf4rU-unsplash.jpg?format=1500w'
+            ],
             charlie['@rid'],
             alicePost['@rid']
           )

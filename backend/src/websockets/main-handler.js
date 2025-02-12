@@ -12,7 +12,8 @@ const mainWebsocketHandler = async (socket) => {
     postPublisher.subscribe(userId, async (newPost) => {
       try {
         const session = await acquireDbSession(await dbSessionPool);
-        // const data = await getUserDetails(session, username);
+        const data = await getUserDetails(session, username);
+        console.log(data);
         const postId = serializeRid(newPost['@rid']);
         const post = await findPost(session, postId);
         closeDbSession(session);
