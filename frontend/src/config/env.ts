@@ -1,4 +1,4 @@
-export const API_URL = `http://${window.location.hostname}:5500/api`;
-export const WEBSOCKET_URL = `ws://${window.location.hostname}:5500/`;
+export const API_URL = `https://${window.location.hostname}/api`;
+export const WEBSOCKET_URL = `wss://${window.location.hostname}/`;
 
 console.log(API_URL, WEBSOCKET_URL);
