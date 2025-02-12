@@ -35,7 +35,6 @@ const populateClasses = (session) => {
       ]);
 
       if (alice !== null && bob !== null && charlie !== null && dave !== null) {
-        // Create follow network (in parallel)
         await Promise.all([
           followUser(session, alice['@rid'], bob.username),
           followUser(session, alice['@rid'], charlie.username),
@@ -43,10 +42,8 @@ const populateClasses = (session) => {
           followUser(session, charlie['@rid'], dave.username)
         ]);
 
-        // Create block network (in parallel)
         await Promise.all([blockUser(session, charlie['@rid'], bob.username)]);
 
-        // Create posts (in parallel)
         const [alicePost, bobPost] = await Promise.all([
           createPost(
             session,
@@ -62,7 +59,6 @@ const populateClasses = (session) => {
           )
         ]);
 
-        // Create initial comments (in parallel)
         const [bobReply, charlieReply] = await Promise.all([
           createPost(
             session,
@@ -80,7 +76,6 @@ const populateClasses = (session) => {
           )
         ]);
 
-        // Create nested comments and Dave's comment (in parallel)
         // await Promise.all([
         //   createComment(
         //     session,

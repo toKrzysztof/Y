@@ -9,8 +9,8 @@
     "prod": "npx @dotenvx/dotenvx run --env-file=.env.prod -- node ./src/server.js",
     "compose-local-windows": "npx @dotenvx/dotenvx run --env-file=.env.local -- node ./scripts/_run-compose-local-windows.js",
     "compose-local-linux": "npx @dotenvx/dotenvx run --env-file=.env.local -- node ./scripts/_run-compose-local-linux.js",
-    "compose-prod-windows": "npx @dotenvx/dotenvx run --env-file=.env.prod -- node ./scripts/_run-compose-prod-windows.js",
-    "compose-prod-linux": "npx @dotenvx/dotenvx run --env-file=.env.prod -- node ./scripts/_run-compose-prod-linux.js"
+    "compose-prod-windows": "npx @dotenvx/dotenvx run --env-file=.env.prod -- node ./scripts/_run-compose-local-windows.js",
+    "compose-prod-linux": "npx @dotenvx/dotenvx run --env-file=.env.prod -- node ./scripts/_run-compose-local-linux.js"
   },
   "author": "Krzysztof Torończak",
   "license": "ISC",
