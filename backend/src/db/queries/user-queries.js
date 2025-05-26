@@ -166,29 +166,29 @@ const blockUser = async (session, userId, blockedUsername) => {
     )
     .one();
 
-  // unfollow user on block
-  await session
-    .command(
-      `
-    DELETE EDGE Follows 
-    WHERE out.@rid = :userId 
-    AND in.username = :unfollowedUsername
-  `,
-      { params: { userId, unfollowedUsername: blockedUsername } }
-    )
-    .all();
+  // // unfollow user on block
+  // await session
+  //   .command(
+  //     `
+  //   DELETE EDGE Follows
+  //   WHERE out.@rid = :userId
+  //   AND in.username = :unfollowedUsername
+  // `,
+  //     { params: { userId, unfollowedUsername: blockedUsername } }
+  //   )
+  //   .all();
 
-  // make user unfollow on block
-  await session
-    .command(
-      `
-    DELETE EDGE Follows 
-    WHERE in.@rid = :userId 
-    AND out.username = :unfollowedUsername
-  `,
-      { params: { userId, unfollowedUsername: blockedUsername } }
-    )
-    .all();
+  // // make user unfollow on block
+  // await session
+  //   .command(
+  //     `
+  //   DELETE EDGE Follows
+  //   WHERE in.@rid = :userId
+  //   AND out.username = :unfollowedUsername
+  // `,
+  //     { params: { userId, unfollowedUsername: blockedUsername } }
+  //   )
+  //   .all();
 
   if (!existingEdge) {
     const query = injectRids(

@@ -39,6 +39,7 @@ const triggerReRender = () => {
     (item as InfiniteScrollContent).key = new Date().toString();
     return item;
   });
+
 };
 
 const infiniteScrollStore = useInfiniteScrollStore();

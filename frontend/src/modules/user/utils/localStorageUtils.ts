@@ -62,7 +62,7 @@ export const addUserBlocked = (username: string) => {
   const blockedUsers = JSON.parse(localStorage.getItem('blockedUsers') ?? '[{}]');
 
   blockedUsers.push({ username });
-  removeUserFollowed(username);
+  // removeUserFollowed(username);
   localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers));
 };
 

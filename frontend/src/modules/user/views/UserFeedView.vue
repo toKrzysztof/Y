@@ -16,7 +16,7 @@ const submitButtonLabels = { regularLabel: 'Post', loadingLabel: 'Posting...' };
     :postsPerPage="15"
     :no-items-message="'No posts yet...'"
     :base-fetch-url="`${API_URL}/user/post/follow`"
-    :filter-predicate="((post) => !isUserBlocked((post as Post).authorUsername) && isUserFollowed((post as Post).authorUsername))"
+    :filter-predicate="((post) => isUserFollowed((post as Post).authorUsername))"
   >
     <template #regular-content>
       <UserPostFormComponent

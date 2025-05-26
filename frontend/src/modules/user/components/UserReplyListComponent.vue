@@ -3,10 +3,11 @@ import UserPostComponent from './UserPostComponent.vue';
 import type { Post } from '../models/post-model';
 import UserPostFormComponent from './UserPostFormComponent.vue';
 import { useRoute } from 'vue-router';
+import type { InfiniteScrollContent } from '../models/infinite-scroll-content.model';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const props = defineProps<{
-  postList: Post[];
+  postList: (Post & InfiniteScrollContent)[];
 }>();
 
 const route = useRoute();
@@ -22,7 +23,11 @@ const submitButtonLabels = { regularLabel: 'Reply', loadingLabel: 'Replying...' 
     :parent-id="parentId"
   ></UserPostFormComponent>
   <ol ref="listElement" class="reply-list">
-    <li v-for="post in postList" v-bind:key="post.id" class="user-reply">
+    <li
+      v-for="post in postList"
+      v-bind:key="`${post.id}-${post.key}`"
+      class="user-reply"
+    >
       <UserPostComponent :post="post" :thread-view="false"></UserPostComponent>
     </li>
     <p v-if="postList.length === 0" class="paragraph-center">No replies yet...</p>
