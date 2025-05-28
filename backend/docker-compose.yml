@@ -16,14 +16,3 @@ services:
       interval: 15s
       timeout: 10s
       retries: 5
-
-  nginx-local:
-    image: nginx:stable-alpine3.20-perl
-    container_name: nginx-local
-    ports:
-      - '5500:5500'
-    depends_on:
-      orientdb:
-        condition: service_healthy
-    volumes:
-      - ./nginx-local.conf:/etc/nginx/nginx.conf
